@@ -9,6 +9,9 @@ import scrapy
 
 
 class ReceipesItem(scrapy.Item):
+    """
+    Stores the extracted data as scrapy item.
+    """
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    #title = scrapy.Field()
+    html_raw = scrapy.Field()

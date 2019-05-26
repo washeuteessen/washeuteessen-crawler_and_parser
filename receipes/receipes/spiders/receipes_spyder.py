@@ -1,28 +1,32 @@
+from ..items import ReceipesItem
 import scrapy
 
 class ReceipesSpyder(scrapy.Spider):
     """ 
     This class scrapes desired urls. 
-      
-    Attributes: 
-        real (int): The real part of complex number. 
-        imag (int): The imaginary part of complex number. 
     """
     # define name of spyder
     name = "receipes"
 
     # define start urls
-    start_ulrs = ["https://www.chefkoch.de/rezepte"]
+    start_urls = ["https://www.chefkoch.de/rezepte/"]
+    #start_urls = ["https://www.heise.de/"]
 
     def parse(self, response):
         """
         Parse html reponse of scraper.
 
         Attributes:
+            response (str): HTML source code of scraped page.
 
         Returns:
             title (dict): Dict with title of receipe as value.
         """
-        title = response.css("title").extract()
+        # instantiate items
+        items = ReceipesItem()
 
-        yield {"title": title}
+        # store information as item
+        items["html_raw"] = response.body
+
+        # get items
+        yield items
