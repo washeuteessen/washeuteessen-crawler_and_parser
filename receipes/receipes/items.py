@@ -13,5 +13,5 @@ class ReceipesItem(scrapy.Item):
     Stores the extracted data as scrapy item.
     """
     # define the fields for your item here like:
-    #title = scrapy.Field()
-    html_raw = scrapy.Field()
+    title = scrapy.Field()
+    url = scrapy.Field()

@@ -9,8 +9,7 @@ class ReceipesSpyder(scrapy.Spider):
     name = "receipes"
 
     # define start urls
-    start_urls = ["https://www.chefkoch.de/rezepte/"]
-    #start_urls = ["https://www.heise.de/"]
+    start_urls = ["https://www.chefkoch.de/rs/s0e1n1z1b0i0m100000/Rezepte.html"]
 
     def parse(self, response):
         """
@@ -25,8 +24,13 @@ class ReceipesSpyder(scrapy.Spider):
         # instantiate items
         items = ReceipesItem()
 
+        # get title, url
+        title = response.css(".ds-h3.ds-heading-link::text").extract()
+        url = response.css("body > main > article > a::attr(href)").extract()
+
         # store information as item
-        items["html_raw"] = response.body
+        items["title"] = title
+        items["url"] = url
 
         # get items
         yield items
