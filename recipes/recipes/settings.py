@@ -9,7 +9,7 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'receipes'
+BOT_NAME = 'recipes'
 
 SPIDER_MODULES = ['receipes.spiders']
 NEWSPIDER_MODULE = 'receipes.spiders'

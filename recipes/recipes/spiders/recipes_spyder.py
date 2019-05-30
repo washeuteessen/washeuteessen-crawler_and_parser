@@ -8,7 +8,7 @@ class ReceipesSpyder(scrapy.Spider):
     This class scrapes desired url with pagination. 
     """
     # define name of spyder
-    name = "receipes"
+    name = "recipes"
 
     # define start urls
     start_urls = ["https://www.chefkoch.de/rs/s0e1n1z1b0i0m100000/Rezepte.html"]
@@ -64,6 +64,19 @@ class ReceipesSpyder(scrapy.Spider):
                                             if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1 \
                                             else ingredient.xpath('td[2]/a/text()').extract_first().strip() \
                                             for ingredient in ingredients]
+
+        # desired scheme
+        # {"ingridients" : [
+        #     { 
+        #         "name": "Test",
+        #         "amount": "300g"
+        #     },
+        #     {
+        #         "name": "Test2",
+        #         "amount": "5kg"
+        #     }
+        #     ]
+        #     }
 
         # get text
         text = " ".join(response.css("#rezept-zubereitung::text").extract()) \
