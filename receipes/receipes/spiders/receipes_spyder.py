@@ -1,9 +1,11 @@
 from ..items import ReceipesItem
 import scrapy
+import subprocess
+import urllib
 
 class ReceipesSpyder(scrapy.Spider):
     """ 
-    This class scrapes desired urls. 
+    This class scrapes desired url with pagination. 
     """
     # define name of spyder
     name = "receipes"
@@ -22,22 +24,23 @@ class ReceipesSpyder(scrapy.Spider):
             response (str): HTML source code of scraped page.
 
         Returns:
-            title (dict): Dict with title of receipe as value.
+            items.json (dict): Json file with title and url of receipes as value.
         """
         # instantiate items
         items = ReceipesItem()
 
         # get all receipes 
+        #response_decoded = response.body.decode(response.encoding)#.encode('utf-8')
         all_receipes = response.css("body > main > article")
 
         # iterate over receipes 
         for receipe in all_receipes:
             # get title and url
-            title = receipe.css("a::attr(data-vars-recipe-title)").extract()
-            url = receipe.css("a::attr(href)").extract()
+            title = receipe.css("a::attr(data-vars-recipe-title)").extract_first()
+            url = receipe.css("a::attr(href)").extract()#[0].encode().decode("utf-8")
 
             # store title and url as item
-            items["title"] = title
+            items["title"] = title #urllib.parse.unquote(title.encode('utf8')).decode('utf8')
             items["url"] = url
 
             # get items
@@ -47,9 +50,12 @@ class ReceipesSpyder(scrapy.Spider):
         next_page = "https://www.chefkoch.de/rs/s"+ str(ReceipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
         
         # check if next page number is below threshold
-        if ReceipesSpyder.page_number <= 100:
+        if ReceipesSpyder.page_number <= 60:
             # increase page number by 30
             ReceipesSpyder.page_number += 30
 
             # get response of next page
             yield response.follow(next_page, callback = self.parse)
+
+if __name__=="__main__":
+    subprocess.call("scrapy", "crawl", "receipes", "-s", "JOBDIR=crawls/receipes-1")
