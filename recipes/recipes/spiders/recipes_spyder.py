@@ -59,25 +59,22 @@ class RecipesSpyder(scrapy.Spider):
 
         # get ingredients
         ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
-        ingredients_dict = {}
-        ingredients_dict['amount'] = [ingredient.xpath('td[1]//text()').extract_first().strip() for ingredient in ingredients]
-        ingredients_dict['ingredient'] = [ingredient.xpath('td[2]//text()').extract_first().strip() \
-                                            if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1 \
-                                            else ingredient.xpath('td[2]/a/text()').extract_first().strip() \
-                                            for ingredient in ingredients]
+        ingredients_list = []
+        for ingredient in ingredients:
+            # initialize empty dict for ingredient
+            ingredient_dict = {}
 
-        # desired scheme
-        # {"ingridients" : [
-        #     { 
-        #         "name": "Test",
-        #         "amount": "300g"
-        #     },
-        #     {
-        #         "name": "Test2",
-        #         "amount": "5kg"
-        #     }
-        #     ]
-        #     }
+            # get name of ingredient
+            if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1:
+                ingredient_dict['name'] = ingredient.xpath('td[2]//text()').extract_first().strip()
+            else:
+                ingredient_dict['name'] = ingredient.xpath('td[2]/a/text()').extract_first().strip()
+
+            # get amount of ingredient
+            ingredient_dict["amount"] = ingredient.xpath('td[1]//text()').extract_first().strip() 
+
+            # append ingredient dict to ingredients list
+            ingredients_list.append(ingredient_dict)
 
         # get text
         text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
@@ -87,7 +84,7 @@ class RecipesSpyder(scrapy.Spider):
         # store information as item
         items["title"] = title 
         # items["img_src"] = img_src
-        items["ingredients"] = ingredients_dict
+        items["ingredients"] = ingredients_list
         items["url"] = response.url
         items["text"] = text
 
