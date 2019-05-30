@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for receipes project
+# Scrapy settings for recipes project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -11,12 +11,12 @@
 
 BOT_NAME = 'recipes'
 
-SPIDER_MODULES = ['receipes.spiders']
-NEWSPIDER_MODULE = 'receipes.spiders'
+SPIDER_MODULES = ['recipes.spiders']
+NEWSPIDER_MODULE = 'recipes.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'receipes (+http://www.yourdomain.com)'
+#USER_AGENT = 'recipes (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -50,13 +50,13 @@ FEED_EXPORT_ENCODING = "utf-8"
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'receipes.middlewares.ReceipesSpiderMiddleware': 543,
+#    'recipes.middlewares.RecipesSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'receipes.middlewares.ReceipesDownloaderMiddleware': 543,
+#    'recipes.middlewares.RecipesDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -68,7 +68,7 @@ FEED_EXPORT_ENCODING = "utf-8"
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'receipes.pipelines.ReceipesPipeline': 300,
+#    'recipes.pipelines.RecipesPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)

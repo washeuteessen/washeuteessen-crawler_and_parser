@@ -1,9 +1,9 @@
-from ..items import ReceipesItem
+from ..items import RecipesItem
 import scrapy
 import subprocess
 import urllib
 
-class ReceipesSpyder(scrapy.Spider):
+class RecipesSpyder(scrapy.Spider):
     """ 
     This class scrapes desired url with pagination. 
     """
@@ -24,37 +24,37 @@ class ReceipesSpyder(scrapy.Spider):
             response (str): HTML source code of scraped page.
 
         Returns:
-            items.json (dict): Json file with title and url of receipes as value.
+            items.json (dict): Json file with title and url of recipes as value.
         """
-        # get all receipes 
-        receipes = response.css("body > main > article")
+        # get all recipes 
+        recipes = response.css("body > main > article")
 
-        # iterate over receipes 
-        for receipe in receipes:
+        # iterate over recipes 
+        for recipe in recipes:
             # extract information from html
-            url = receipe.css("a::attr(href)").extract_first()
+            url = recipe.css("a::attr(href)").extract_first()
             yield scrapy.Request(url, callback=self.parse_attr)
 
         # # define url for next page
-        # next_page = "https://www.chefkoch.de/rs/s"+ str(ReceipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
+        # next_page = "https://www.chefkoch.de/rs/s"+ str(recipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
         
         # # check if next page number is below threshold
-        # if ReceipesSpyder.page_number <= 60:
+        # if recipesSpyder.page_number <= 60:
         #     # increase page number by 30
-        #     ReceipesSpyder.page_number += 30
+        #     recipesSpyder.page_number += 30
 
         #     # get response of next page
         #     yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
         # instantiate items
-        items = ReceipesItem()
+        items = RecipesItem()
 
-        # get receipe title
+        # get recipe title
         title = response.css(".page-title::text").extract_first()
 
         #
-        # img_src = receipe.css("a figure amp-img::attr(src)").extract_first()
+        # img_src = recipe.css("a figure amp-img::attr(src)").extract_first()
 
         # get ingredients
         ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
@@ -93,4 +93,4 @@ class ReceipesSpyder(scrapy.Spider):
         return items
 
 if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "receipes", "-s", "JOBDIR=crawls/receipes-1")
+    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

@@ -8,7 +8,7 @@
 import scrapy
 
 
-class ReceipesItem(scrapy.Item):
+class RecipesItem(scrapy.Item):
     """
     Stores the extracted data as scrapy item.
     """
