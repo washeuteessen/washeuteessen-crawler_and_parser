@@ -24,8 +24,8 @@ ROBOTSTXT_OBEY = True
 ### ENCDOING
 FEED_EXPORT_ENCODING = "utf-8"
 
-# Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# Configure maximum concurrent requests performed by Scrapy 
+CONCURRENT_REQUESTS = 16
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -58,6 +58,11 @@ FEED_EXPORT_ENCODING = "utf-8"
 #DOWNLOADER_MIDDLEWARES = {
 #    'recipes.middlewares.RecipesDownloaderMiddleware': 543,
 #}
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

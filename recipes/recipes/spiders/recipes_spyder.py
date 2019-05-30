@@ -36,16 +36,16 @@ class RecipesSpyder(scrapy.Spider):
             url = recipe.css("a::attr(href)").extract_first()
             yield scrapy.Request(url, callback=self.parse_attr)
 
-        # # define url for next page
-        # next_page = "https://www.chefkoch.de/rs/s"+ str(recipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
+        # define url for next page
+        next_page = "https://www.chefkoch.de/rs/s"+ str(RecipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
         
-        # # check if next page number is below threshold
-        # if recipesSpyder.page_number <= 60:
-        #     # increase page number by 30
-        #     recipesSpyder.page_number += 30
+        # check if next page number is below threshold
+        if RecipesSpyder.page_number <= 60:
+            # increase page number by 30
+            RecipesSpyder.page_number += 30
 
-        #     # get response of next page
-        #     yield response.follow(next_page, callback = self.parse)
+            # get response of next page
+            yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
         # instantiate items
