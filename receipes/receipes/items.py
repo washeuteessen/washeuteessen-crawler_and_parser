@@ -16,3 +16,5 @@ class ReceipesItem(scrapy.Item):
     title = scrapy.Field()
     img_src = scrapy.Field()
     url = scrapy.Field()
+    text = scrapy.Field()
+    ingredients = scrapy.Field()
