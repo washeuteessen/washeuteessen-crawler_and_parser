@@ -1,4 +1,5 @@
 from ..items import RecipesItem
+import re
 import scrapy
 import subprocess
 import urllib
@@ -79,9 +80,9 @@ class RecipesSpyder(scrapy.Spider):
         #     }
 
         # get text
-        text = " ".join(response.css("#rezept-zubereitung::text").extract()) \
-                        .replace("\n", " ").replace("\r", " ") \
-                        .re.sub(' +', ' ')
+        text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
+                        .replace("\n", " ").replace("\r", " ")) \
+                        .strip()
 
         # store information as item
         items["title"] = title 
