@@ -50,9 +50,13 @@ class ReceipesSpyder(scrapy.Spider):
         # instantiate items
         items = ReceipesItem()
 
-        # extract data from recipe page
+        # get receipe title
         title = response.css(".page-title::text").extract_first()
+
+        #
         # img_src = receipe.css("a figure amp-img::attr(src)").extract_first()
+
+        # get ingredients
         ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
         ingredients_dict = {}
         ingredients_dict['amount'] = [ingredient.xpath('td[1]//text()').extract_first().strip() for ingredient in ingredients]
@@ -60,9 +64,11 @@ class ReceipesSpyder(scrapy.Spider):
                                             if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1 \
                                             else ingredient.xpath('td[2]/a/text()').extract_first().strip() \
                                             for ingredient in ingredients]
+
+        # get text
         text = " ".join(response.css("#rezept-zubereitung::text").extract()) \
                         .replace("\n", " ").replace("\r", " ") \
-                        .strip()
+                        .re.sub(' +', ' ')
 
         # store information as item
         items["title"] = title 
