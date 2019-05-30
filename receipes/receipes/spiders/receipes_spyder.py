@@ -30,17 +30,18 @@ class ReceipesSpyder(scrapy.Spider):
         items = ReceipesItem()
 
         # get all receipes 
-        #response_decoded = response.body.decode(response.encoding)#.encode('utf-8')
         all_receipes = response.css("body > main > article")
 
         # iterate over receipes 
         for receipe in all_receipes:
             # get title and url
             title = receipe.css("a::attr(data-vars-recipe-title)").extract_first()
-            url = receipe.css("a::attr(href)").extract()#[0].encode().decode("utf-8")
+            img_src = receipe.css("a figure amp-img::attr(src)").extract_first()
+            url = receipe.css("a::attr(href)").extract_first()
 
             # store title and url as item
-            items["title"] = title #urllib.parse.unquote(title.encode('utf8')).decode('utf8')
+            items["title"] = title 
+            items["img_src"] = img_src
             items["url"] = url
 
             # get items

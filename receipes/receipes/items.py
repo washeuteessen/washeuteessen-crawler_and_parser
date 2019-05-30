@@ -14,4 +14,5 @@ class ReceipesItem(scrapy.Item):
     """
     # define the fields for your item here like:
     title = scrapy.Field()
+    img_src = scrapy.Field()
     url = scrapy.Field()
