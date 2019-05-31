@@ -1,2 +1,2 @@
 # webcrawler
-crawl recipes pages
+Use scrapy to crawl recipe pages. 
