@@ -14,6 +14,7 @@ class RecipesItem(scrapy.Item):
     """
     # define the fields for your item here like:
     title = scrapy.Field()
+    domain = scrapy.Field()
     img_src = scrapy.Field()
     url = scrapy.Field()
     text = scrapy.Field()

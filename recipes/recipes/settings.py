@@ -37,6 +37,9 @@ DOWNLOAD_DELAY = abs(np.random.normal(1,1,1))
 CONCURRENT_REQUESTS_PER_DOMAIN = 10
 #CONCURRENT_REQUESTS_PER_IP = 16
 
+## LOGGING
+LOG_FILE = "logs.log"
+
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
 
