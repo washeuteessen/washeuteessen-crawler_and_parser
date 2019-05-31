@@ -40,7 +40,7 @@ class RecipesSpyder(scrapy.Spider):
         next_page = "https://www.chefkoch.de/rs/s"+ str(RecipesSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
         
         # check if next page number is below threshold
-        if RecipesSpyder.page_number <= 60:
+        if RecipesSpyder.page_number <= 2100000:
             # increase page number by 30
             RecipesSpyder.page_number += 30
 
