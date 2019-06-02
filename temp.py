@@ -1,15 +1,16 @@
 import json
 from jsonmerge import merge
 
-# with open('recipes/items_chefkoch_80k.json', "r") as json_file:  
-#     recipes = json.load(json_file)
+with open('recipes/items_chefkoch_79k.txt', "r") as json_file:  
+    json_file = json_file.read()
+    recipes = json.load(json_file)
 
-# with open('recipes/scr_img_300.json', "r") as json_file:  
-#     src_img = json.load(json_file)
+with open('recipes/src_img_73k.txt', "r") as json_file:  
+    json_file = json_file.read()
+    src_img = json.load(json_file)
 
-input_file = open('recipes/scr_img_300.json')
-json_array = json.load(input_file)
-print(json_array)
+print(recipes)
+print(src_img)
 
 # merged = merge(src_img, recipes)
 
