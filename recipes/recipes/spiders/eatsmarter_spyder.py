@@ -62,29 +62,8 @@ class EatsmarterSpyder(scrapy.Spider):
         # get title picture
         img_src = response.css("img.photo::attr(src)").extract_first()
 
-        # initialize empty dict for ingredients
-        ingredient_dict = {}
-
         # get ingredients
-        # TODO: select container of ingredients
-        ingredients = response.css("#preparation .last")
-        ingredients_list = []
-
-        for ingredient in ingredients:
-            # initialize empty list for ingredients
-            ingredient_dict = {}
-
-            # get name of ingredient
-            ingredient_dict['name'] = response.css('a.name::text').extract()
-
-            # get amount and type of ingredient
-            amount_type = response.css("span.amount::text").extract() +\
-                          response.css('span.type::text').extract()
-
-            ingredient_dict["amount"] =  amount_type
-
-            # append pair of ingredients to list of ingredients
-            ingredients_list.append(ingredient_dict)
+        ingredients = response.css('a.name::text').extract()
 
         # get text
         text = " ".join(response.css("div.preparation-step-items p::text").extract())
@@ -93,7 +72,7 @@ class EatsmarterSpyder(scrapy.Spider):
         items["title"] = title 
         items["domain"] = self.name
         items["img_src"] = img_src
-        items["ingredients"] = ingredient_dict
+        items["ingredients"] = ingredients
         items["url"] = response.url
         items["text"] = text
 
