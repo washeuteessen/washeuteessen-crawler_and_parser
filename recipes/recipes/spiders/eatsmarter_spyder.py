@@ -45,7 +45,7 @@ class EatsmarterSpyder(scrapy.Spider):
         next_page = f"https://eatsmarter.de/suche/rezepte?page={EatsmarterSpyder.page_number}&ft=&op=Suchen&form_build_id=form-YbfzSni-wg3IicfsadcO_O9FSpmEEoQSfFhec4gsb94&form_id=eatsmarter_search_search_form"
         
         # check if next page number is below threshold
-        if EatsmarterSpyder.page_number <= 10:
+        if EatsmarterSpyder.page_number <= 1000:
             # increase page number by 1
             EatsmarterSpyder.page_number += 1
 
