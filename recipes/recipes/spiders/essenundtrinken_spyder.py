@@ -17,9 +17,9 @@ class ChefkochSpyder(CrawlSpider):
     start_urls = ["https://www.essen-und-trinken.de"]
 
     # define rule to only parse links with "rezepte"
-    rules = Rule(LxmlLinkExtractor(allow=f"/rezepte/*", callback="parse"))
+    rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*"), callback="parse_item"),)
 
-    def parse(self, response):
+    def parse_item(self, response):
         """
         Parse html reponse of scraper.
 
@@ -29,62 +29,22 @@ class ChefkochSpyder(CrawlSpider):
         Returns:
             items.json (dict): Json file with title and url of recipes as value.
         """
-        # get all recipes 
-        recipes = response.css("body > main > article")
-
-        # iterate over recipes 
-        for recipe in recipes:
-            # extract information from html
-            url = recipe.css("a::attr(href)").extract_first()
-            yield scrapy.Request(url, callback=self.parse_attr)
-
-        # define url for next page
-        next_page = start_urls[0] 
-        
-        # check if next page number is below threshold
-        if ChefkochSpyder.page_number <= 2100000:
-            # increase page number by 30
-            ChefkochSpyder.page_number += 30
-
-            # get response of next page
-            yield response.follow(next_page, callback = self.parse)
-
-    def parse_attr(self, response):
         # instantiate items
         items = RecipesItem()
 
         # get recipe title
-        title = response.css(".page-title::text").extract_first()
+        title = response.css(".headline-title::text").extract_first()
 
         # get title picture
-        img_src = response.css("a#0::attr(href)").extract_first()
-        
-
-        # get ingredients
-        ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
-        ingredients_list = []
-        for ingredient in ingredients:
-            # get name of ingredient
-            if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1:
-                ingredient = ingredient.xpath('td[2]//text()').extract_first().strip()
-            else:
-                ingredient = ingredient.xpath('td[2]/a/text()').extract_first().strip()
-
-            # append ingredient dict to ingredients list
-            ingredients_list.append(ingredient)
-
-        # get text
-        text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
-                        .replace("\n", " ").replace("\r", " ")) \
-                        .strip()
+        img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
 
         # store information as item
         items["title"] = title 
         items["domain"] = self.name
         items["img_src"] = img_src
-        items["ingredients"] = ingredients_list
-        items["url"] = response.url
-        items["text"] = text
+        # items["ingredients"] = ingredients_list
+        # items["url"] = response.url
+        # items["text"] = text
 
         return items
 
