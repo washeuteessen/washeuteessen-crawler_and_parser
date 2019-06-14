@@ -17,7 +17,7 @@ class ChefkochSpyder(CrawlSpider):
     start_urls = ["https://www.essen-und-trinken.de"]
 
     # define rule to only parse links with "rezepte"
-    rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*"), callback="parse_item", follow=True),)
+    rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*", deny=".jpg"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
         """
@@ -37,7 +37,6 @@ class ChefkochSpyder(CrawlSpider):
 
         # get title picture
         img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
-        .recipe-img > img:nth-child(1)
 
         # get ingredients
         ingredients = response.css("ul.ingredients-list li::text").extract()
