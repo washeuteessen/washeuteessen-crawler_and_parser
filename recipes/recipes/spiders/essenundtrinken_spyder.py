@@ -18,7 +18,7 @@ class ChefkochSpyder(CrawlSpider):
 
     # define rule to only parse links with "rezepte"
     #TODO: expand rule to follow more than one depth
-    rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*"), callback="parse_item"),)
+    rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
         """
@@ -41,7 +41,14 @@ class ChefkochSpyder(CrawlSpider):
         img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
 
         # get ingredients
-        # (".ingredients-list li")
+        ingredients = response.css("ul.ingredients-list li::text").extract()
+
+        # strip \n
+        ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+
+        # strip whitespace
+        ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
+        ingredients = [ingredient.strip() for ingredient in ingredients]
 
         # get text
         #TODO: check why some texts are not scraped
@@ -51,7 +58,7 @@ class ChefkochSpyder(CrawlSpider):
         items["title"] = title 
         items["domain"] = self.name
         items["img_src"] = img_src
-        # items["ingredients"] = ingredients_list
+        items["ingredients"] = ingredients
         items["url"] = response.url
         items["text"] = text
 
