@@ -17,7 +17,6 @@ class ChefkochSpyder(CrawlSpider):
     start_urls = ["https://www.essen-und-trinken.de"]
 
     # define rule to only parse links with "rezepte"
-    #TODO: expand rule to follow more than one depth
     rules = (Rule(LxmlLinkExtractor(allow="/rezepte/[0-9]{5}-*"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
@@ -36,9 +35,9 @@ class ChefkochSpyder(CrawlSpider):
         # get recipe title
         title = response.css(".headline-title::text").extract_first()
 
-        # TODO: check why some times image source is not found
         # get title picture
         img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+        .recipe-img > img:nth-child(1)
 
         # get ingredients
         ingredients = response.css("ul.ingredients-list li::text").extract()
@@ -50,9 +49,15 @@ class ChefkochSpyder(CrawlSpider):
         ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
         ingredients = [ingredient.strip() for ingredient in ingredients]
 
+        # strip empty list elemens
+        ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+
         # get text
-        #TODO: check why some texts are not scraped
         text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+
+        # sometimes text is not within paragraph
+        if len(text)<1:
+            text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
 
         # store information as item
         items["title"] = title 
