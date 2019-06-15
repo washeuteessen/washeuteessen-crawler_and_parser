@@ -6,44 +6,56 @@ from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 import subprocess
 import urllib
 
-class EssenundtrinkenSpyder(CrawlSpider):
+class WomenshealthSpyder(CrawlSpider):
     """ 
-    This class scrapes desired url by searching for recipe urls. 
+    This class scrapes www.womenshealth.de for recipes.
+
+    CrawlingApproach:
+    - start with subpage dedicated to food
+    - crawl all internal links
+    - store items only if url is recipe
     """
     # define name of spyder
-    name = "essenundtrinken"
+    name = "womenshealth"
 
     # define start urls
-    start_urls = ["https://www.essen-und-trinken.de"]
+    start_urls = ["https://www.womenshealth.de/food/gesunde-rezepte/"]
 
     # define rule to only parse internal links 
-    rules = (Rule(LxmlLinkExtractor(allow_domains="essen-und-trinken.de"), callback="parse_item", follow=True),)
+    rules = (Rule(LxmlLinkExtractor(allow_domains="womenshealth.de"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
         """
-        Parse html reponse of scraper.
+        Parse html response of scraper.
 
         Attributes:
-            response (str): HTML source code of scraped page.
+            response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with title and url of recipes as value.
+            items.json (dict): Json file with 
+                                - title, 
+                                - domain name, 
+                                - image url, 
+                                - list of ingredients, 
+                                - url and 
+                                - description text
+                                of recipe as value.
         """
         # instantiate items
         items = RecipesItem()
 
         # check if url contains a recipe
-        if re.search(pattern="/rezepte/[0-9]{5}-", string=response.url) is not None and re.search(pattern=".jpg", string=response.url) is None:
+        if re.search(pattern="-rezept.[0-9]{7}.html", string=response.url) is not None:
 
             # get recipe title
-            title = response.css(".headline-title::text").extract_first()
+            title = response.css(".v-A_-headline--ad::text").extract()[-1]
             title = title.strip()
 
             # get title picture
-            img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+            img_src = response.css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
 
             # get ingredients
-            ingredients = response.css("ul.ingredients-list li::text").extract()
+            ingredients = response.css("ul li::text").extract()
 
             # strip \n
             ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
@@ -56,11 +68,7 @@ class EssenundtrinkenSpyder(CrawlSpider):
             ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
 
             # get text
-            text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
-
-            # sometimes text is not within paragraph
-            if len(text)<1:
-                text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+            text = " ".join(response.css(".rdb-instructions li::text").extract())
 
             # store information as item
             items["title"] = title 
