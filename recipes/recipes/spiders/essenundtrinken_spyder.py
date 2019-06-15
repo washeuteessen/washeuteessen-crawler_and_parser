@@ -8,7 +8,12 @@ import urllib
 
 class EssenundtrinkenSpyder(CrawlSpider):
     """ 
-    This class scrapes desired url by searching for recipe urls. 
+    This class scrapes www.essen-und-trinken.de for recipes.
+
+    CrawlingApproach:
+    - start at main page
+    - follow all internal links
+    - if url matches certain regex pattern identify url as recipe and extract content
     """
     # define name of spyder
     name = "essenundtrinken"

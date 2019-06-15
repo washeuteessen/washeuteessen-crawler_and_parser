@@ -13,7 +13,7 @@ class WomenshealthSpyder(CrawlSpider):
     CrawlingApproach:
     - start with subpage dedicated to food
     - crawl all internal links
-    - store items only if url is recipe
+    - if url matches certain regex pattern identify url as recipe and extract content
     """
     # define name of spyder
     name = "womenshealth"

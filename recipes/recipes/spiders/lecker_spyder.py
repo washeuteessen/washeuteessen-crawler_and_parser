@@ -8,7 +8,9 @@ import urllib
 
 class LeckerSpyder(CrawlSpider):
     """ 
-    This class scrapes desired url by searching for recipe urls. 
+    This class scrapes www.lecker.de for recipes.
+
+    CrawlingApproach:
     """
     # define name of spyder
     name = "lecker"

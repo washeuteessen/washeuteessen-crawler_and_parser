@@ -6,13 +6,19 @@ import urllib
 
 class ChefkochSpyder(scrapy.Spider):
     """ 
-    This class scrapes desired url with pagination. 
+    This class scrapes www.chefkoch.de for recipes.
+
+    CrawlingApproach:
+    - start at recipe search which lists all recipes
+    - extract url of each recipe step by step
+    - go to each recipe url and extract content
+    - go to next page by incrementing page number by 30
     """
     # define name of spyder
     name = "chefkoch"
 
     # define start urls
-    start_urls = ["https://www.chefkoch.de/rs/s0e1n1z1b0i0m100000/Rezepte.html"]
+    start_urls = ["https://www.chefkoch.de/rs/s0/Rezepte.html"]
 
     # define page number
     page_number = 30

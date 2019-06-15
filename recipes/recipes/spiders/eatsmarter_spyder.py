@@ -8,7 +8,13 @@ import urllib
 
 class EatsmarterSpyder(scrapy.Spider):
     """ 
-    This class scrapes domain Eatsmarter. 
+    This class scrapes www.eatsmarter.de for recipes.
+
+    CrawlingApproach:
+    - start at recipe search which lists all recipes
+    - extract url of each recipe step by step
+    - go to each recipe url and extract content
+    - go to next page by incrementing page number by 1
     """
     # define name of spyder
     name = "eatsmarter"
