@@ -19,3 +19,7 @@ class RecipesItem(scrapy.Item):
     url = scrapy.Field()
     text = scrapy.Field()
     ingredients = scrapy.Field()
+
+class RecipesHtml(scrapy.Item):
+    htmlbody = scrapy.Field()
+    domain = scrapy.Field()
