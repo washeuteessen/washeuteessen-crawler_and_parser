@@ -66,8 +66,9 @@ dependencies:
   - pip:
     - jsonmerge==1.6.1
     - jsonschema==3.0.1
+    - pymongo==3.8.0
     - pyrsistent==0.15.2
     - scrapy-user-agents==0.1.1
     - ua-parser==0.8.0
     - user-agents==2.0
-prefix: C:\Anaconda3\envs\webscraping
+prefix: C:\Users\Valen\Anaconda3\envs\webscraping
