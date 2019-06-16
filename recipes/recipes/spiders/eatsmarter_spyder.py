@@ -27,13 +27,20 @@ class EatsmarterSpyder(scrapy.Spider):
 
     def parse(self, response):
         """
-        Parse html reponse of scraper.
+        Parse html response of scraper.
 
         Attributes:
-            response (str): HTML source code of scraped page.
+            response (str): response object of HTML request.
 
         Returns:
-            recipes_eatsmarter.json (dict): Json file with items dict.
+            items.json (dict): Json file with 
+                                - title, 
+                                - domain name, 
+                                - image url, 
+                                - list of ingredients, 
+                                - url and 
+                                - description text
+                                of recipe as value.
         """
         # get all recipes 
         recipes = response.css(".tile")

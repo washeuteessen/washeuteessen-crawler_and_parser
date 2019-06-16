@@ -11,6 +11,9 @@ class LeckerSpyder(CrawlSpider):
     This class scrapes www.lecker.de for recipes.
 
     CrawlingApproach:
+    - go to start page
+    - crawl all internal links
+    - if url matches certain regex pattern identify url as recipe and extract content
     """
     # define name of spyder
     name = "lecker"
@@ -23,46 +26,58 @@ class LeckerSpyder(CrawlSpider):
 
     def parse_item(self, response):
         """
-        Parse html reponse of scraper.
+        Parse html response of scraper.
 
         Attributes:
-            response (str): HTML source code of scraped page.
+            response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with title and url of recipes as value.
+            items.json (dict): Json file with 
+                                - title, 
+                                - domain name, 
+                                - image url, 
+                                - list of ingredients, 
+                                - url and 
+                                - description text
+                                of recipe as value.
         """
         # instantiate items
         items = RecipesItem()
 
         # check if url contains a recipe
-        if re.search(pattern="/rezepte/[0-9]{5}-", string=response.url) is not None and re.search(pattern=".jpg", string=response.url) is None:
+        if re.search(pattern="-[0-9]{5}.html$", string=response.url) is not None and re.search(pattern="datenschutzerklaerung", string=response.url) is None:
 
             # get recipe title
-            title = response.css(".headline-title::text").extract_first()
-            title = title.strip()
-
+            title = response.css("h1::text").extract_first()
+    
             # get title picture
-            img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+            img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
 
-            # get ingredients
-            ingredients = response.css("ul.ingredients-list li::text").extract()
+            # version A of recipe presentation
+            if img_src is not None:
+                # get ingredients
+                ingredients = response.css(".ingredientBlock::text").extract()
 
-            # strip \n
-            ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+                # get text
+                text = " ".join(response.css("dd::text").extract())
+                
+                # strip \n
+                text = re.sub("\n", "", text)
 
-            # strip whitespace
-            ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
-            ingredients = [ingredient.strip() for ingredient in ingredients]
+                # strip whitespace
+                text = re.sub(" +", " ", text)
+                text = text.strip()
 
-            # strip empty list elemens
-            ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+            # version B of recipe presentation 
+            else:
+                # get url of main image
+                img_src = response.css(".typo--editor+ .article-figure--fullsize img::attrc(src)")
 
-            # get text
-            text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+                # get ingredients
+                ingredients = response.css("h2+ ul li::text").extract()
 
-            # sometimes text is not within paragraph
-            if len(text)<1:
-                text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+                # get text
+                text = "no_distinct_text_available"
 
             # store information as item
             items["title"] = title 

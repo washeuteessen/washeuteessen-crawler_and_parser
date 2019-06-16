@@ -26,13 +26,20 @@ class EssenundtrinkenSpyder(CrawlSpider):
 
     def parse_item(self, response):
         """
-        Parse html reponse of scraper.
+        Parse html response of scraper.
 
         Attributes:
-            response (str): HTML source code of scraped page.
+            response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with title and url of recipes as value.
+            items.json (dict): Json file with 
+                                - title, 
+                                - domain name, 
+                                - image url, 
+                                - list of ingredients, 
+                                - url and 
+                                - description text
+                                of recipe as value.
         """
         # instantiate items
         items = RecipesItem()
