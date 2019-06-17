@@ -33,63 +33,17 @@ class LeckerSpyder(CrawlSpider):
 
         Returns:
             items.json (dict): Json file with 
-                                - title, 
                                 - domain name, 
-                                - image url, 
-                                - list of ingredients, 
-                                - url and 
-                                - description text
+                                - html_body
                                 of recipe as value.
         """
         # instantiate items
         items = RecipesItem()
 
-        # check if url contains a recipe
-        if re.search(pattern="-[0-9]{5}.html$", string=response.url) is not None and re.search(pattern="datenschutzerklaerung", string=response.url) is None:
-
-            # get recipe title
-            title = response.css("h1::text").extract_first()
-    
-            # get title picture
-            img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
-
-            # version A of recipe presentation
-            if img_src is not None:
-                # get ingredients
-                ingredients = response.css(".ingredientBlock::text").extract()
-
-                # get text
-                text = " ".join(response.css("dd::text").extract())
-                
-                # strip \n
-                text = re.sub("\n", "", text)
-
-                # strip whitespace
-                text = re.sub(" +", " ", text)
-                text = text.strip()
-
-            # version B of recipe presentation 
-            else:
-                # get url of main image
-                img_src = response.css(".typo--editor+ .article-figure--fullsize img::attrc(src)")
-
-                # get ingredients
-                ingredients = response.css("h2+ ul li::text").extract()
-
-                # get text
-                text = "no_distinct_text_available"
-
-            # store information as item
-            items["title"] = title 
-            items["domain"] = self.name
-            items["img_src"] = img_src
-            items["ingredients"] = ingredients
-            items["url"] = response.url
-            items["text"] = text
-
-        else:
-            pass
-
+        # store information as item
+        items["html_body"] = response.body
+        items["domain"] = self.name
+        
         return items
 
 if __name__=="__main__":

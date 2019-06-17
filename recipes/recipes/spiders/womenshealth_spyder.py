@@ -33,53 +33,17 @@ class WomenshealthSpyder(CrawlSpider):
 
         Returns:
             items.json (dict): Json file with 
-                                - title, 
                                 - domain name, 
-                                - image url, 
-                                - list of ingredients, 
-                                - url and 
-                                - description text
+                                - html_body
                                 of recipe as value.
         """
+
         # instantiate items
         items = RecipesItem()
 
-        # check if url contains a recipe
-        if re.search(pattern="-rezept.[0-9]{7}.html", string=response.url) is not None:
-
-            # get recipe title
-            title = response.css(".v-A_-headline--ad::text").extract()[-1]
-            title = title.strip()
-
-            # get title picture
-            img_src = response.css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
-
-            # get ingredients
-            ingredients = response.css("ul li::text").extract()
-
-            # strip \n
-            ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
-
-            # strip whitespace
-            ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
-            ingredients = [ingredient.strip() for ingredient in ingredients]
-
-            # strip empty list elemens
-            ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
-
-            # get text
-            text = " ".join(response.css(".rdb-instructions li::text").extract())
-
-            # store information as item
-            items["title"] = title 
-            items["domain"] = self.name
-            items["img_src"] = img_src
-            items["ingredients"] = ingredients
-            items["url"] = response.url
-            items["text"] = text
-
-        else:
-            pass
+        # store information as item
+        items["html_body"] = response.body
+        items["domain"] = self.name
 
         return items
 

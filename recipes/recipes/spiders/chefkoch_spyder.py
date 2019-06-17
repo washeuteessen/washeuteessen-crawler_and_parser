@@ -61,6 +61,18 @@ class ChefkochSpyder(scrapy.Spider):
             yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
+        """
+        Parse html response of scraper.
+
+        Attributes:
+            response (str): response object of HTML request.
+
+        Returns:
+            items.json (dict): Json file with 
+                                - domain name, 
+                                - html_body
+                                of recipe as value.
+        """
 
         # instantiate items
         items = RecipesItem()

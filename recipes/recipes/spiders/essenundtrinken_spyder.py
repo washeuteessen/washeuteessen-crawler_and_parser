@@ -33,12 +33,8 @@ class EssenundtrinkenSpyder(CrawlSpider):
 
         Returns:
             items.json (dict): Json file with 
-                                - title, 
                                 - domain name, 
-                                - image url, 
-                                - list of ingredients, 
-                                - url and 
-                                - description text
+                                - html_body
                                 of recipe as value.
         """
         # instantiate items
