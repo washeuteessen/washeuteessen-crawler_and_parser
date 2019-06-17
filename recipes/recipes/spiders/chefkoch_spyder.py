@@ -61,41 +61,13 @@ class ChefkochSpyder(scrapy.Spider):
             yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
+
         # instantiate items
         items = RecipesItem()
 
-        # get recipe title
-        title = response.css(".page-title::text").extract_first()
-
-        # get title picture
-        img_src = response.css("a#0::attr(href)").extract_first()
-        
-
-        # get ingredients
-        ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
-        ingredients_list = []
-        for ingredient in ingredients:
-            # get name of ingredient
-            if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1:
-                ingredient = ingredient.xpath('td[2]//text()').extract_first().strip()
-            else:
-                ingredient = ingredient.xpath('td[2]/a/text()').extract_first().strip()
-
-            # append ingredient dict to ingredients list
-            ingredients_list.append(ingredient)
-
-        # get text
-        text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
-                        .replace("\n", " ").replace("\r", " ")) \
-                        .strip()
-
         # store information as item
-        items["title"] = title 
+        items["html_body"] = response.body
         items["domain"] = self.name
-        items["img_src"] = img_src
-        items["ingredients"] = ingredients_list
-        items["url"] = response.url
-        items["text"] = text
 
         return items
 

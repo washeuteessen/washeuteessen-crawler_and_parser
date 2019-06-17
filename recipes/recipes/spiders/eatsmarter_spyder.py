@@ -69,24 +69,8 @@ class EatsmarterSpyder(scrapy.Spider):
         # instantiate items
         items = RecipesItem()
 
-        # get recipe title
-        title = response.css("h1::text").extract_first()
-
-        # get title picture
-        img_src = response.css("img.photo::attr(src)").extract_first()
-
-        # get ingredients
-        ingredients = response.css('a.name::text').extract()
-
-        # get text
-        text = " ".join(response.css("div.preparation-step-items p::text").extract())
-
         # store information as item
-        items["title"] = title 
+        items["html_body"] = response.body
         items["domain"] = self.name
-        items["img_src"] = img_src
-        items["ingredients"] = ingredients
-        items["url"] = response.url
-        items["text"] = text
 
         return items

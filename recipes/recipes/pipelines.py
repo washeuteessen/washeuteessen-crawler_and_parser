@@ -18,7 +18,7 @@ class RecipesPipeline(object):
         )
         
         # Choosing Database and Collection
-        db = self.conn["test"]
+        db = self.conn["washeuteessen"]
         self.collection = db["recipes"]
 
     # Processing
