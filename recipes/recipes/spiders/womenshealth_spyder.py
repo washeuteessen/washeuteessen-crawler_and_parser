@@ -42,7 +42,7 @@ class WomenshealthSpyder(CrawlSpider):
         items = RecipesItem()
 
         # store information as item
-        items["html_body"] = response.body
+        items["html_raw"] = response.body
         items["domain"] = self.name
 
         return items

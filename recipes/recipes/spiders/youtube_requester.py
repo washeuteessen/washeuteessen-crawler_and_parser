@@ -1,22 +1,22 @@
-from apiclient.discovery import build
+# from apiclient.discovery import build
 
-key = ""
+# key = ""
 
-# build connection to youtube resource
-youtube = build("youtube", "v3", developerKey = key)
+# # build connection to youtube resource
+# youtube = build("youtube", "v3", developerKey = key)
 
-# search videos for keyword "Rezept"
-request = youtube.search().list(q = "Rezept", part="snippet", type="video", maxResults=50)
+# # search videos for keyword "Rezept"
+# request = youtube.search().list(q = "Rezept", part="snippet", type="video", maxResults=50)
 
-# execute http request
-result = request.execute()
+# # execute http request
+# result = request.execute()
 
-# get recipes info
-recipes = result["items"]
+# # get recipes info
+# recipes = result["items"]
 
-# get titles
-for recipe in recipes:
-    print(f"title: {recipe['snippet']['title']} | \ndescription: {recipe['snippet']['description']}")
+# # get titles
+# for recipe in recipes:
+#     print(f"title: {recipe['snippet']['title']} | \ndescription: {recipe['snippet']['description']}")
 
 # # get title and description
 # recipes_dict = {}

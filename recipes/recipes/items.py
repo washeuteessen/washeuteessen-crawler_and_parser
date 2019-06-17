@@ -13,5 +13,5 @@ class RecipesItem(scrapy.Item):
     Stores the extracted data as scrapy item.
     """
     # define the fields (dict keys) for item
-    htmlbody = scrapy.Field()
+    html_raw = scrapy.Field()
     domain = scrapy.Field()

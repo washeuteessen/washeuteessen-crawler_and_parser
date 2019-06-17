@@ -13,13 +13,13 @@ class RecipesPipeline(object):
         
         # Connecting to Server with Name and Port
         self.conn = pymongo.MongoClient(
-            'localhost',
+            '192.168.99.100', #VM IP-address
             27017
         )
         
         # Choosing Database and Collection
         db = self.conn["washeuteessen"]
-        self.collection = db["recipes"]
+        self.collection = db["recipes_html_raw"]
 
     # Processing
     def process_item(self, item, spider):
