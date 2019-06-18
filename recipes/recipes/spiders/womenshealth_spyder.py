@@ -32,6 +32,7 @@ class WomenshealthSpyder(CrawlSpider):
             response (str): response object of HTML request.
 
         Returns:
+        ------------
             items.json (dict): Json file with 
                                 - domain name, 
                                 - html_body
@@ -42,10 +43,8 @@ class WomenshealthSpyder(CrawlSpider):
         items = RecipesItem()
 
         # store information as item
+        items["url"] = response.url
         items["html_raw"] = response.body
         items["domain"] = self.name
 
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

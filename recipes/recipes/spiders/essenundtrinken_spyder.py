@@ -41,6 +41,7 @@ class EssenundtrinkenSpyder(CrawlSpider):
         items = RecipesItem()
 
         # store information as item
+        items["url"] = response.url
         items["html_raw"] = response.body
         items["domain"] = self.name
 
