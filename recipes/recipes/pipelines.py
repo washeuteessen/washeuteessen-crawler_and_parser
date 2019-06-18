@@ -8,12 +8,12 @@
 import pymongo
 
 class RecipesPipeline(object):
-    # Initialise of the class
     def __init__ (self):
         
         # Connecting to Server with Name and Port
         self.conn = pymongo.MongoClient(
             '192.168.99.100', #VM IP-address
+            '127.0.0.1'
             27017
         )
         
@@ -21,9 +21,9 @@ class RecipesPipeline(object):
         db = self.conn["washeuteessen"]
         self.collection = db["recipes_html_raw"]
 
-    # Processing
     def process_item(self, item, spider):
         
         # Inserting Scraped item into MongoDB
         self.collection.insert(dict(item))
+
         return item
