@@ -17,24 +17,40 @@ Use scrapy to crawl title, url, image-url, ingredients and text of german recipe
 |12| www.veganheaven.de|0|???|
 |13| www.youtube.de|0|???|
 
-## Development
-# build new docker image
-```
-docker build .
-```
+## Local run
 
-# run docker image (ID)
-```
-docker run --env SPIDER_NAME=ChefkochSypder image
-```
+1. build image
+    ```bash
+    docker build .
+    ```
+    
+2. run image 
+    ```bash
+    docker run --env SPIDER_NAME=ChefkochSypder image
+    ```
 
-## Deployment
-#
-``` 
-oc project washeuteessen-test
-```
+## Deploy to Openshift
 
-#
-```
-oc start-build washeuteessen-crawler --from-dir=. --follow
-```
+1. verify your logged in and select the correct namespace
+    ```bash
+    $ oc projects
+    $ oc project *namespace*
+    ```
+    
+2. start build with
+    ```bash
+    $ oc start-build washeuteessen-crawler --from-dir=. --follow
+    ```
+
+3. verify result
+    ```bash 
+    $ oc describe dc/washeuteessen-crawler
+    
+    ...
+    Deployment #3 (latest):
+    	Name:		washeuteessen-crawler-X
+    	Created:	2 minutes ago
+    	Status:		Active
+    ...
+    
+    ```
