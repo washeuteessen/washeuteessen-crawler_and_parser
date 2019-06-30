@@ -9,11 +9,8 @@ from recipes.spiders.essenundtrinken_spyder import EssenundtrinkenSpyder
 from recipes.spiders.lecker_spyder import LeckerSpyder
 from recipes.spiders.womenshealth_spyder import WomenshealthSpyder
 
-# load project settings
-settings = get_project_settings()
-
 # define crawling process
-process = CrawlerProcess(settings=settings)
+process = CrawlerProcess(get_project_settings())
 
 # set spider name
 spiderName = os.environ['SPIDER_NAME']
