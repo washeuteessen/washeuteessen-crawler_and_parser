@@ -10,7 +10,7 @@ from recipes.spiders.lecker_spyder import LeckerSpyder
 from recipes.spiders.womenshealth_spyder import WomenshealthSpyder
 
 # load project settings
-setting = get_project_settings()
+settings = get_project_settings()
 
 # define crawling process
 process = CrawlerProcess(settings=settings)
