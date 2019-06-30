@@ -4,7 +4,7 @@ import scrapy
 import subprocess
 import urllib
 
-class ChefkochSpyder(scrapy.Spider):
+class IchkocheSpyder(scrapy.Spider):
     """ 
     This class scrapes www.ichkoche.at for recipes.
 
