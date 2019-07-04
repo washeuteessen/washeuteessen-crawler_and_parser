@@ -23,3 +23,4 @@ class RecipesItem(scrapy.Item):
 class RecipesHtml(scrapy.Item):
     htmlbody = scrapy.Field()
     domain = scrapy.Field()
+    datetime = scrapy.Field()

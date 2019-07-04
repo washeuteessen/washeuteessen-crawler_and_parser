@@ -1,3 +1,4 @@
+from datetime import datetime
 from ..items import RecipesItem
 import re
 import scrapy
@@ -96,8 +97,6 @@ class IchkocheSpyder(scrapy.Spider):
         items["ingredients"] = ingredients_list
         items["url"] = response.url
         items["text"] = text
+        items["datetime"] = datetime.now()
 
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

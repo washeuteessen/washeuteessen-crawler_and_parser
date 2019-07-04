@@ -1,5 +1,6 @@
-from ..items import RecipesItem
+from datetime import datetime
 import re
+from ..items import RecipesItem
 import scrapy
 import subprocess
 import urllib
@@ -96,6 +97,7 @@ class ChefkochSpyder(scrapy.Spider):
         items["ingredients"] = ingredients_list
         items["url"] = response.url
         items["text"] = text
+        items["datetime"] = datetime.now()
 
         return items
 

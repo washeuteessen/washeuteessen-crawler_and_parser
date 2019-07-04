@@ -1,3 +1,4 @@
+from datetime import datetime
 from ..items import RecipesItem
 import re
 import scrapy
@@ -86,6 +87,7 @@ class LeckerSpyder(CrawlSpider):
             items["ingredients"] = ingredients
             items["url"] = response.url
             items["text"] = text
+            items["datetime"] = datetime.now()
 
         else:
             pass
