@@ -43,13 +43,13 @@ class HTMLParser(object):
         # parse html
         if domain == "chefkoch":
             # get recipe title
-            title = response.css(".page-title::text").extract_first()
+            title = html["html_raw"].css(".page-title::text").extract_first()
 
             # get title picture
-            img_src = response.css("a#0::attr(href)").extract_first()
+            img_src = html["html_raw"].css("a#0::attr(href)").extract_first()
             
             # get ingredients
-            ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
+            ingredients = html["html_raw"].xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
             ingredients_list = []
             for ingredient in ingredients:
                 # get name of ingredient
@@ -61,31 +61,129 @@ class HTMLParser(object):
                 # append ingredient dict to ingredients list
                 ingredients_list.append(ingredient)
 
+            ingredients = ingredients_list
+
             # get text
-            text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
+            text = re.sub(" +", " ", " ".join(html["html_raw"].css("#rezept-zubereitung::text").extract()) \
                             .replace("\n", " ").replace("\r", " ")) \
                             .strip()
 
         elif domain == "eatsmarter":
-            pass
+            # get recipe title
+            title = html["html_raw"].css("h1::text").extract_first()
+
+            # get title picture
+            img_src = html["html_raw"].css("img.photo::attr(src)").extract_first()
+
+            # get ingredients
+            ingredients = html["html_raw"].css('a.name::text').extract()
+
+            # get text
+            text = " ".join(html["html_raw"].css("div.preparation-step-items p::text").extract())
 
         elif domain == "lecker":
-            pass
+            # check if url contains a recipe
+            if re.search(pattern="-[0-9]{5}.html$", string=html["url"]) is not None and re.search(pattern="datenschutzerklaerung", string=html["html_raw"].url) is None:
+
+                # get recipe title
+                title = html["html_raw"].css("h1::text").extract_first()
+        
+                # get title picture
+                img_src = html["html_raw"].css(".article-figure--default-image img::attr(src)").extract_first()
+
+                # version A of recipe presentation
+                if img_src is not None:
+                    # get ingredients
+                    ingredients = html["html_raw"].css(".ingredientBlock::text").extract()
+
+                    # get text
+                    text = " ".join(html["html_raw"].css("dd::text").extract())
+                    
+                    # strip \n
+                    text = re.sub("\n", "", text)
+
+                    # strip whitespace
+                    text = re.sub(" +", " ", text)
+                    text = text.strip()
+
+                # version B of recipe presentation 
+                else:
+                    # get url of main image
+                    img_src = html["html_raw"].css(".typo--editor+ .article-figure--fullsize img::attrc(src)")
+
+                    # get ingredients
+                    ingredients = html["html_raw"].css("h2+ ul li::text").extract()
+
+                    # get text
+                    text = "no_distinct_text_available"
 
         elif domain == "essenundtrinken":
-            pass
+            # check if url contains a recipe
+            if re.search(pattern="/rezepte/[0-9]{5}-", string=html["url"]) is not None and re.search(pattern=".jpg", string=html["html_raw"].url) is None:
+
+                # get recipe title
+                title = html["html_raw"].css(".headline-title::text").extract_first()
+                title = title.strip()
+
+                # get title picture
+                img_src = html["html_raw"].css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+
+                # get ingredients
+                ingredients = html["html_raw"].css("ul.ingredients-list li::text").extract()
+
+                # strip \n
+                ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+
+                # strip whitespace
+                ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
+                ingredients = [ingredient.strip() for ingredient in ingredients]
+
+                # strip empty list elemens
+                ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+
+                # get text
+                text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+
+                # sometimes text is not within paragraph
+                if len(text)<1:
+                text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text::text").extract())
 
         elif domain == "womenshealth":
-            pass
+            # check if url contains a recipe
+            if re.search(pattern="-rezept.[0-9]{7}.html", string=html["url"]) is not None:
+
+                # get recipe title
+                title = html["html_raw"].css(".v-A_-headline--ad::text").extract()[-1]
+                title = title.strip()
+
+                # get title picture
+                img_src = html["html_raw"].css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
+
+                # get ingredients
+                ingredients = html["html_raw"].css("ul li::text").extract()
+
+                # strip \n
+                ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+
+                # strip whitespace
+                ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
+                ingredients = [ingredient.strip() for ingredient in ingredients]
+
+                # strip empty list elemens
+                ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+
+                # get text
+                text = " ".join(html["html_raw"].css(".rdb-instructions li::text").extract())
 
         else:
-            logging.info(f"No applicable parsing method found. Please check whether parsing scheme exists for desired {domain}.")
+            logging.info(f"No applicable parsing method found. 
+                           Please check whether parsing scheme exists for desired {domain}.")
     
         # store information as item
         item["title"] = title 
-        item["domain"] = domain
+        item["domain"] = html["domain"]
         item["img_src"] = img_src
-        item["ingredients"] = ingredients_list
+        item["ingredients"] = ingredients
         item["url"] = html["url"]
         item["text"] = text
 
