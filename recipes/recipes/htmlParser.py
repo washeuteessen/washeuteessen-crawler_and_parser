@@ -40,6 +40,7 @@ class HTMLParser(object):
         # get domain of raw html
         domain = html["domain"]
 
+        logging.info(f"Parse {item["url"]} ...")
         # parse html
         if domain == "chefkoch":
             # get recipe title
@@ -178,7 +179,10 @@ class HTMLParser(object):
         else:
             logging.info(f"No applicable parsing method found. 
                            Please check whether parsing scheme exists for desired {domain}.")
-    
+
+        # TODO: What if nothing is found? item Definition an die richtige stelle, 
+        # dass es vor else gemacht wird aber nicht bei jedem elif einzeln
+        
         # store information as item
         item["title"] = title 
         item["domain"] = html["domain"]
@@ -198,5 +202,8 @@ class HTMLParser(object):
             Nothing, directly writes dict to Mongo DB.
 
         """
+        logging.info(f"Write {item["url"]} to mongoDB...")
         # dump data to mongo DB
         self.collection.insert(dict(item))
+
+        logging.info(f"Succesfully inserted {item["url"]} into mongoDB")
