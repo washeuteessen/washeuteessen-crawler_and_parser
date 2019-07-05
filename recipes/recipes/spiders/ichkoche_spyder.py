@@ -1,4 +1,3 @@
-from datetime import datetime
 from ..items import RecipesItem
 import re
 import scrapy
@@ -96,7 +95,5 @@ class IchkocheSpyder(scrapy.Spider):
         items["img_src"] = img_src
         items["ingredients"] = ingredients_list
         items["url"] = response.url
-        items["text"] = text
-        items["datetime"] = datetime.now()
 
         return items

@@ -1,4 +1,3 @@
-from datetime import datetime
 import re
 from ..items import RecipesItem
 import scrapy
@@ -53,13 +52,11 @@ class ChefkochSpyder(scrapy.Spider):
         # define url for next page
         next_page = "https://www.chefkoch.de/rs/s"+ str(ChefkochSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
         
-        # check if next page number is below threshold
-        if ChefkochSpyder.page_number <= 60:
-            # increase page number by 30
-            ChefkochSpyder.page_number += 30
+        # increase page number by 30
+        ChefkochSpyder.page_number += 30
 
-            # get response of next page
-            yield response.follow(next_page, callback = self.parse)
+        # get response of next page
+        yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
         # instantiate items
@@ -97,9 +94,5 @@ class ChefkochSpyder(scrapy.Spider):
         items["ingredients"] = ingredients_list
         items["url"] = response.url
         items["text"] = text
-        items["datetime"] = datetime.now()
 
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

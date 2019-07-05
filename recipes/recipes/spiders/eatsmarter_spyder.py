@@ -1,4 +1,3 @@
-from datetime import datetime
 from ..items import RecipesItem
 import logging
 import os
@@ -89,6 +88,5 @@ class EatsmarterSpyder(scrapy.Spider):
         items["ingredients"] = ingredients
         items["url"] = response.url
         items["text"] = text
-        items["datetime"] = datetime.now()
 
         return items

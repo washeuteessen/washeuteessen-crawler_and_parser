@@ -1,4 +1,3 @@
-from datetime import datetime
 from ..items import RecipesItem
 import re
 import scrapy
@@ -82,12 +81,8 @@ class EssenundtrinkenSpyder(CrawlSpider):
             items["ingredients"] = ingredients
             items["url"] = response.url
             items["text"] = text
-            items["datetime"] = datetime.now()
 
         else:
             pass
 
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")
