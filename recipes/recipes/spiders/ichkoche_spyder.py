@@ -98,6 +98,3 @@ class IchkocheSpyder(scrapy.Spider):
         items["text"] = text
 
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

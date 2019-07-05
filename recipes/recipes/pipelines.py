@@ -7,7 +7,6 @@
 
 import pymongo
 
-
 class RecipesPipeline(object):
     # Initialise of the class
     def __init__(self):
@@ -23,6 +22,25 @@ class RecipesPipeline(object):
 
     # Processing
     def process_item(self, item, spider):
-        # Inserting Scraped item into MongoDB
-        self.collection.insert(dict(item))
+        """
+        Function to insert scraped item into MongoDB
+        """
+        
+        # Convert item to dict
+        item_dict = dict(item)
+        
+        # Trying to update existing document with htmlbody and current time
+        documentupdated = self.collection.update({"url": item_dict["url"]},
+                                                 {"$set":{"title":item_dict["title"],
+                                                          "ingredients":item_dict["ingredients"],
+                                                          "text":item_dict["text"],
+                                                          "img_src":item_dict["img_src"]},
+                                                  "$currentDate": {"lastFound": True}
+                                                  }
+                                                )
+        
+        # If update Failed insert new document
+        if documentupdated["matchedCount"] == 0:
+            self.collection.insert(item_dict)
+        
         return item
