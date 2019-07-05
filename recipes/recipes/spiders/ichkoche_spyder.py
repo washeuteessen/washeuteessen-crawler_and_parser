@@ -95,5 +95,6 @@ class IchkocheSpyder(scrapy.Spider):
         items["img_src"] = img_src
         items["ingredients"] = ingredients_list
         items["url"] = response.url
+        items["text"] = text
 
         return items
