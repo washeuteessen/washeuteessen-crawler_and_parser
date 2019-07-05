@@ -40,7 +40,7 @@ class RecipesPipeline(object):
                                                 )
         
         # If update Failed insert new document
-        if documentupdated["matchedCount"] == 0:
+        if documentupdated["nModified"] == 0:
             self.collection.insert(item_dict)
         
         return item
