@@ -18,7 +18,7 @@ class RecipesPipeline(object):
 
         # Choosing Database and Collection
         db = self.conn["recipes"]
-        self.collection = db["recipes_raw"]
+        self.collection = db["recipes"]
 
     # Processing
     def process_item(self, item, spider):
@@ -31,7 +31,10 @@ class RecipesPipeline(object):
         
         # Trying to update existing document with htmlbody and current time
         documentupdated = self.collection.update({"url": item_dict["url"]},
-                                                 {"$set":{"htmlbody":item_dict["htmlbody"]},
+                                                 {"$set":{"title":item_dict["title"],
+                                                          "ingredients":item_dict["ingredients"],
+                                                          "text":item_dict["text"],
+                                                          "img_src":item_dict["img_src"]},
                                                   "$currentDate": {"lastFound": True}
                                                   }
                                                 )
