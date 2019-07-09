@@ -55,3 +55,13 @@ Use scrapy to crawl title, url, image-url, ingredients and text of german recipe
     ...
     
     ```
+## Run cronjob on OpenShift
+
+1. Get all jobs
+```
+oc get jobs
+```
+2. Abort pod
+```
+oc delete pod <name>
+```
