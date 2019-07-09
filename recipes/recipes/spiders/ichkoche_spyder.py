@@ -21,7 +21,7 @@ class IchkocheSpyder(scrapy.Spider):
     start_urls = ["https://www.ichkoche.at/rezepte-az"]
 
     # define page number
-    page_number = 30
+    page_number = 1
 
     def parse(self, response):
         """
@@ -46,19 +46,17 @@ class IchkocheSpyder(scrapy.Spider):
         # iterate over recipes 
         for recipe in recipes:
             # extract information from html
-            url = recipe.css("a::attr(href)").extract_first()
+            url = "https://www.ichkoche.at" + recipe.css("a::attr(href)").extract_first()
             yield scrapy.Request(url, callback=self.parse_attr)
 
         # define url for next page
-        next_page = "https://www.chefkoch.de/rs/s"+ str(ChefkochSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
+        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(ChefkochSpyder.page_number) 
         
-        # check if next page number is below threshold
-        if ChefkochSpyder.page_number <= 2100000:
-            # increase page number by 30
-            ChefkochSpyder.page_number += 30
+        # increase page number by 1
+        IchkocheSpyder.page_number += 1
 
-            # get response of next page
-            yield response.follow(next_page, callback = self.parse)
+        # get response of next page
+        yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
         # instantiate items
@@ -68,11 +66,13 @@ class IchkocheSpyder(scrapy.Spider):
         title = response.css(".page-title::text").extract_first()
 
         # get title picture
+        # TODO: img src
         img_src = response.css("a#0::attr(href)").extract_first()
-        
+
 
         # get ingredients
-        ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
+        # TODO: ingredients fertig stellen
+        ingredients = response.css('.ingredient').extract()
         ingredients_list = []
         for ingredient in ingredients:
             # get name of ingredient
@@ -85,6 +85,7 @@ class IchkocheSpyder(scrapy.Spider):
             ingredients_list.append(ingredient)
 
         # get text
+        # TODO: text extrahieren
         text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
                         .replace("\n", " ").replace("\r", " ")) \
                         .strip()
