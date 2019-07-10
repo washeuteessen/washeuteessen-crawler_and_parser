@@ -63,7 +63,7 @@ class IchkocheSpyder(scrapy.Spider):
         items = RecipesItem()
 
         # get recipe title
-        title = response.css(".page-title::text").extract_first()
+        title = response.xpath("//title/text()").extract_first()[:-28]
 
         # get title picture
         # TODO: img src
@@ -85,10 +85,8 @@ class IchkocheSpyder(scrapy.Spider):
             ingredients_list.append(ingredient)
 
         # get text
-        # TODO: text extrahieren
-        text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
-                        .replace("\n", " ").replace("\r", " ")) \
-                        .strip()
+        text = response.xpath("//div[@class='description']/ol/li").extract_first()
+        text = re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip()
 
         # store information as item
         items["title"] = title 
