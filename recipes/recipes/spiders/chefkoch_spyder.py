@@ -68,7 +68,6 @@ class ChefkochSpyder(scrapy.Spider):
         # get title picture
         img_src = response.css("a#0::attr(href)").extract_first()
         
-
         # get ingredients
         ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
         ingredients_list = []

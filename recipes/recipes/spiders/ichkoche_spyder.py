@@ -50,7 +50,7 @@ class IchkocheSpyder(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse_attr)
 
         # define url for next page
-        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(ChefkochSpyder.page_number) 
+        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(IchkocheSpyder.page_number) 
         
         # increase page number by 1
         IchkocheSpyder.page_number += 1
@@ -66,23 +66,17 @@ class IchkocheSpyder(scrapy.Spider):
         title = response.xpath("//title/text()").extract_first()[:-28]
 
         # get title picture
-        # TODO: img src
-        img_src = response.css("a#0::attr(href)").extract_first()
-
+        img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
 
         # get ingredients
-        # TODO: ingredients fertig stellen
-        ingredients = response.css('.ingredient').extract()
-        ingredients_list = []
-        for ingredient in ingredients:
-            # get name of ingredient
-            if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1:
-                ingredient = ingredient.xpath('td[2]//text()').extract_first().strip()
-            else:
-                ingredient = ingredient.xpath('td[2]/a/text()').extract_first().strip()
+        # extract links which contain links
+        ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
 
-            # append ingredient dict to ingredients list
-            ingredients_list.append(ingredient)
+        # extract links which don't contain links
+        ingredients_b = response.xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
+
+        # combine both lists
+        ingredients_list = ingredients_a + ingredients_b
 
         # get text
         text = response.xpath("//div[@class='description']/ol/li").extract_first()
