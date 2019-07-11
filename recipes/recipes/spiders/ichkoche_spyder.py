@@ -17,11 +17,11 @@ class IchkocheSpyder(scrapy.Spider):
     # define name of spyder
     name = "ichkoche"
 
-    # define start urls
-    start_urls = ["https://www.ichkoche.at/rezepte-az"]
-
     # define page number
     page_number = 1
+
+    # define start urls
+    start_urls = ["https://www.ichkoche.at/rezepte-az?page=1"]
 
     def parse(self, response):
         """
@@ -41,7 +41,7 @@ class IchkocheSpyder(scrapy.Spider):
                                 of recipe as value.
         """
         # get all recipes 
-        recipes = response.css("body > main > article")
+        recipes = response.xpath("//article/div/h3")
 
         # iterate over recipes 
         for recipe in recipes:
@@ -67,7 +67,7 @@ class IchkocheSpyder(scrapy.Spider):
 
         # get title picture
         img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
-
+        #//*[@id="page_wrap_inner"]/div[3]/div/div[2]/article[1]
         # get ingredients
         # extract links which contain links
         ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
@@ -79,8 +79,8 @@ class IchkocheSpyder(scrapy.Spider):
         ingredients_list = ingredients_a + ingredients_b
 
         # get text
-        text = response.xpath("//div[@class='description']/ol/li").extract_first()
-        text = re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip()
+        texts_list = response.xpath("//div[@class='description']/ol/li").extract()
+        text = " ".join([re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip() for text in texts_list])
 
         # store information as item
         items["title"] = title 

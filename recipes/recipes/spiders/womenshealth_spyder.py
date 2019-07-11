@@ -45,7 +45,7 @@ class WomenshealthSpyder(CrawlSpider):
         items = RecipesItem()
 
         # check if url contains a recipe
-        if re.search(pattern="-rezept.[0-9]{7}.html", string=response.url) is not None:
+        if re.search(pattern="-rezept.[0-9]{6,7}.html", string=response.url) is not None:
 
             # get recipe title
             title = response.css(".v-A_-headline--ad::text").extract()[-1]
