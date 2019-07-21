@@ -65,26 +65,26 @@ Use scrapy to crawl title, url, image-url, ingredients and text of german recipe
     ```
 ## Run cronjob on OpenShift
 
-1. Get all jobs
+1. Show existing all cronjobs
 ```
-oc get jobs
 oc get cronjobs
 ```
-2. Abort pod
-```
-oc delete pod <pod name>
-```
-3. Edit cronjob
-```
-oc edit cronjob <cronjob name>
-```
-4. Edit cronjob
+2. Add new cronjob (examble crawler-ichkoche)
 ```
 $ oc run crawler-ichkoche --image=docker-registry.default.svc:5000/washeuteessen-test \
     --schedule='3919**THU' \
     --restart=Never  
 ```
-5. cronjob sample 
+3. Abort runnning cronjob (pod)
+```
+oc delete pod <pod name>
+```
+4. Edit existing cronjob
+```
+oc edit cronjob <cronjob name>
+```
+
+Examble cronjob settings- crawler-ichkoche 
 ```
 # Please edit the object below. Lines beginning with a '#' will be ignored,
 # and an empty file will abort the edit. If an error occurs while saving this file will be
