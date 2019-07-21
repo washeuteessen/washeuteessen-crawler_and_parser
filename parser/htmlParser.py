@@ -219,8 +219,26 @@ class HTMLParser(object):
                 text = " ".join(html["html_raw"].css(".rdb-instructions li::text").extract())
 
         elif domain == "ichkoche":
-        # TODO: 
+            # get recipe title
+            title = response.xpath("//title/text()").extract_first()[:-28]
 
+            # get title picture
+            img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
+            #//*[@id="page_wrap_inner"]/div[3]/div/div[2]/article[1]
+
+            ## get ingredients
+            # extract ingredients which contain links
+            ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
+
+            # extract links which don't contain links
+            ingredients_b = response.xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
+
+            # combine both lists
+            ingredients_list = ingredients_a + ingredients_b
+
+            # get text
+            texts_list = response.xpath("//div[@class='description']/ol/li").extract()
+            text = " ".join([re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip() for text in texts_list])
 
         else:
             logging.info(f"No applicable parsing method found. 
