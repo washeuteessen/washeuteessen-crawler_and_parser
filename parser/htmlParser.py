@@ -1,3 +1,4 @@
+import re
 import logging
 import pymongo
 
@@ -12,7 +13,7 @@ class HTMLParser(object):
     Class to get unparsed raw html source code and extract relevant recipe information.
     """
 
-    def __init__(db_name, col_name):
+    def __init__(self):
         # connect to mongo
         self.conn = pymongo.MongoClient(
             'mongo',
@@ -20,17 +21,17 @@ class HTMLParser(object):
         )
 
         # load database
-        self.db = conn["washeuteessen"]
+        self.db = self.conn["washeuteessen"]
 
         # load collections
-        self.collection_raw = db["recipes_raw"]
-        self.collection_view = db["unparsedURLS"]
-        self.collection_parsed = db["recipes"]
+        self.collection_raw = self.db["recipes_raw"]
+        self.collection_view = self.db["unparsedURLS"]
+        self.collection_parsed = self.db["recipes"]
 
         # set info if recipe was sucessfully parsed
         self.parsed = None
 
-    def update_raw_recipes(parsed):
+    def update_raw_recipes(self, parsed, url):
         """
         Method to update raw collection with information about success and date.
         
@@ -40,14 +41,14 @@ class HTMLParser(object):
         """
         # write date and parsed status to mongo
         self.collection_raw.update(
-            {"url": html["url"]},
+            {"url": url},
             # write status and date to mongodb
             {"$set": {"parsed_status": parsed,
                       "$currentDate": {"parser_date": True}
                       }}                
         )
 
-    def write_parsed_recipes(item):
+    def write_parsed_recipes(self, item):
         """
         Method to store extracted information into mongo DB.
 
@@ -56,12 +57,12 @@ class HTMLParser(object):
             Nothing, directly writes dict to Mongo DB collection_view.
 
         """
-        logging.info(f"Write {item["url"]} to mongoDB...")
+        logging.info(f"Write {item['url']} to mongoDB...")
 
         # dump data to mongo DB
         self.collection_view.insert(dict(item))
 
-    def parse_html():
+    def parse_html(self):
         """
         Method to check domain of recipe and apply corresponding parsing method
         to extract relevant information from raw html.
@@ -72,7 +73,7 @@ class HTMLParser(object):
         """
         # randomly open 1x raw html
         html = self.collection_view.aggregate([{
-            $sample: {size: 1}
+            "$sample": {"size": 1}
         }])
 
         # create empty dict
@@ -81,7 +82,7 @@ class HTMLParser(object):
         # get domain of raw html
         domain = html["domain"]
 
-        logging.info(f"Parse {item["url"]} ...")
+        logging.info(f"Parse {item['url']} ...")
 
         # parse html
         if domain == "chefkoch":
@@ -189,7 +190,7 @@ class HTMLParser(object):
 
                 # sometimes text is not within paragraph
                 if len(text)<1:
-                text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+                    text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text::text").extract())
 
         elif domain == "womenshealth":
             # check if url contains a recipe
@@ -220,38 +221,37 @@ class HTMLParser(object):
 
         elif domain == "ichkoche":
             # get recipe title
-            title = response.xpath("//title/text()").extract_first()[:-28]
+            title = html["html_raw"].xpath("//title/text()").extract_first()[:-28]
 
             # get title picture
-            img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
+            img_src = html["html_raw"].xpath("//img[@itemprop='image']/@src").extract_first()
             #//*[@id="page_wrap_inner"]/div[3]/div/div[2]/article[1]
 
             ## get ingredients
             # extract ingredients which contain links
-            ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
+            ingredients_a = html["html_raw"].xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
 
             # extract links which don't contain links
-            ingredients_b = response.xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
+            ingredients_b = html["html_raw"].xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
 
             # combine both lists
             ingredients_list = ingredients_a + ingredients_b
 
             # get text
-            texts_list = response.xpath("//div[@class='description']/ol/li").extract()
+            texts_list = html["html_raw"].xpath("//div[@class='description']/ol/li").extract()
             text = " ".join([re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip() for text in texts_list])
 
         else:
-            logging.info(f"No applicable parsing method found. 
-                           Please check whether parsing scheme exists for desired {domain}.")
+            logging.info(f"No applicable parsing method found. Please check whether parsing scheme exists for desired {domain}.")
             self.parsed = 0
 
         # write found specs to item dict        
-        if self.parsed = 0:
-            logging.info(f"Skipping {html["url"]}")
+        if self.parsed == 0:
+            logging.info(f"Skipping {html['url']}")
     
         else:
             self.parsed = 1
-            logging.info(f"Successfully parsed {html["url"]}")
+            logging.info(f"Successfully parsed {html['url']}")
             # store information as item
             item["title"] = title 
             item["domain"] = html["domain"]
@@ -261,6 +261,10 @@ class HTMLParser(object):
             item["text"] = text
 
             # write parsed recipe to mongo collection recipes
-            write_parsed_recipes(item)
+            self.write_parsed_recipes(item)
 
-        update_raw_recipes(parsed)
+        self.update_raw_recipes(self.parsed, html["url"])
+
+if __name__ == "__main__":
+    parser = HTMLParser()
+    parser.parse_html()
