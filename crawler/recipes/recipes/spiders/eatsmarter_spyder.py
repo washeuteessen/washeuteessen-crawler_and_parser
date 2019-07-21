@@ -73,7 +73,8 @@ class EatsmarterSpyder(scrapy.Spider):
             response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with 
+            items.json (dict): Json file with
+                                - scraped url, 
                                 - domain name, 
                                 - html_body
                                 of recipe as value.

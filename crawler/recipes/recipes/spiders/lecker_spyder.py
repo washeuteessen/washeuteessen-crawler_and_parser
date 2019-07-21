@@ -33,6 +33,7 @@ class LeckerSpyder(CrawlSpider):
 
         Returns:
             items.json (dict): Json file with 
+                                - scraped url,
                                 - domain name, 
                                 - html_body
                                 of recipe as value.
@@ -46,6 +47,3 @@ class LeckerSpyder(CrawlSpider):
         items["domain"] = self.name
         
         return items
-
-if __name__=="__main__":
-    subprocess.call("scrapy", "crawl", "recipes", "-s", "JOBDIR=crawls/recipes-1")

@@ -34,6 +34,7 @@ class WomenshealthSpyder(CrawlSpider):
         Returns:
         ------------
             items.json (dict): Json file with 
+                                - scraped url,
                                 - domain name, 
                                 - html_body
                                 of recipe as value.
