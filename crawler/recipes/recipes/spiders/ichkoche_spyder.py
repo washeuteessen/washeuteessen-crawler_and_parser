@@ -17,11 +17,11 @@ class IchkocheSpyder(scrapy.Spider):
     # define name of spyder
     name = "ichkoche"
 
-    # define start urls
-    start_urls = ["https://www.ichkoche.at/rezepte-az"]
-
     # define page number
-    page_number = 30
+    page_number = 1
+
+    # define start urls
+    start_urls = ["https://www.ichkoche.at/rezepte-az?page=1"]
 
     def parse(self, response):
         """
@@ -41,24 +41,22 @@ class IchkocheSpyder(scrapy.Spider):
                                 of recipe as value.
         """
         # get all recipes 
-        recipes = response.css("body > main > article")
+        recipes = response.xpath("//article/div/h3")
 
         # iterate over recipes 
         for recipe in recipes:
             # extract information from html
-            url = recipe.css("a::attr(href)").extract_first()
+            url = "https://www.ichkoche.at" + recipe.css("a::attr(href)").extract_first()
             yield scrapy.Request(url, callback=self.parse_attr)
 
         # define url for next page
-        next_page = "https://www.chefkoch.de/rs/s"+ str(IchkocheSpyder.page_number) + "e1n1z1b0i0m100000/Rezepte.html"
+        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(IchkocheSpyder.page_number) 
         
-        # check if next page number is below threshold
-        if IchkocheSpyder.page_number <= 2100000:
-            # increase page number by 30
-            IchkocheSpyder.page_number += 30
+        # increase page number by 1
+        IchkocheSpyder.page_number += 1
 
-            # get response of next page
-            yield response.follow(next_page, callback = self.parse)
+        # get response of next page
+        yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
         """

@@ -38,7 +38,8 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 10
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 ## LOGGING
-LOG_FILE = "logs.log"
+#LOG_FILE = "logs.log"
+LOG_LEVEL = "INFO"
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False

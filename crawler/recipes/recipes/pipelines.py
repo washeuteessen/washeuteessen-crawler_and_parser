@@ -8,22 +8,38 @@
 import pymongo
 
 class RecipesPipeline(object):
-    def __init__ (self):
-        
+    # Initialise of the class
+    def __init__(self):
         # Connecting to Server with Name and Port
         self.conn = pymongo.MongoClient(
-            '192.168.99.100', #VM IP-address
-            '127.0.0.1'
+            'mongo',
             27017
         )
-        
+
         # Choosing Database and Collection
-        db = self.conn["washeuteessen"]
-        self.collection = db["recipes_html_raw"]
+        db = self.conn["recipes"]
+        self.collection = db["recipes"]
 
     def process_item(self, item, spider):
+        """
+        Function to insert scraped item into MongoDB
+        """
         
-        # Inserting Scraped item into MongoDB
-        self.collection.insert(dict(item))
-
+        # Convert item to dict
+        item_dict = dict(item)
+        
+        # Trying to update existing document with htmlbody and current time
+        documentupdated = self.collection.update({"url": item_dict["url"]},
+                                                 {"$set":{"title":item_dict["title"],
+                                                          "ingredients":item_dict["ingredients"],
+                                                          "text":item_dict["text"],
+                                                          "img_src":item_dict["img_src"]},
+                                                  "$currentDate": {"lastFound": True}
+                                                  }
+                                                )
+        
+        # If update Failed insert new document
+        if documentupdated["nModified"] == 0:
+            self.collection.insert(item_dict)
+        
         return item
