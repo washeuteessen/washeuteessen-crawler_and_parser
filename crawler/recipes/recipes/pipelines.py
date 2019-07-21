@@ -20,7 +20,6 @@ class RecipesPipeline(object):
         db = self.conn["recipes"]
         self.collection = db["recipes"]
 
-    # Processing
     def process_item(self, item, spider):
         """
         Function to insert scraped item into MongoDB

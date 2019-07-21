@@ -59,35 +59,25 @@ class IchkocheSpyder(scrapy.Spider):
         yield response.follow(next_page, callback = self.parse)
 
     def parse_attr(self, response):
+        """
+        Parse html response of scraper.
+
+        Attributes:
+            response (str): response object of HTML request.
+
+        Returns:
+            items.json (dict): Json file with 
+                                - scraped url,
+                                - domain name, 
+                                - html_body
+                                of recipe as value.
+        """
         # instantiate items
         items = RecipesItem()
 
-        # get recipe title
-        title = response.xpath("//title/text()").extract_first()[:-28]
-
-        # get title picture
-        img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
-        #//*[@id="page_wrap_inner"]/div[3]/div/div[2]/article[1]
-        # get ingredients
-        # extract links which contain links
-        ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
-
-        # extract links which don't contain links
-        ingredients_b = response.xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
-
-        # combine both lists
-        ingredients_list = ingredients_a + ingredients_b
-
-        # get text
-        texts_list = response.xpath("//div[@class='description']/ol/li").extract()
-        text = " ".join([re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip() for text in texts_list])
-
         # store information as item
-        items["title"] = title 
-        items["domain"] = self.name
-        items["img_src"] = img_src
-        items["ingredients"] = ingredients_list
         items["url"] = response.url
-        items["text"] = text
+        items["html_raw"] = response.body
+        items["domain"] = self.name
 
         return items
