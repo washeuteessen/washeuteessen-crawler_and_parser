@@ -8,6 +8,9 @@ import pymongo
 # mongo
 
 class HTMLParser(object):
+    """
+    Class to get unparsed raw html source code and extract relevant recipe information.
+    """
 
     def __init__(db_name, col_name):
         # connect to mongo
@@ -29,7 +32,11 @@ class HTMLParser(object):
 
     def update_raw_recipes(parsed):
         """
-        Method to store success of parsing in raw collection.
+        Method to update raw collection with information about success and date.
+        
+        Returns:
+        ------------
+            Nothing, directly writes dict to Mongo DB collection_raw.
         """
         # write date and parsed status to mongo
         self.collection_raw.update(
@@ -46,7 +53,7 @@ class HTMLParser(object):
 
         Returns:
         ------------
-            Nothing, directly writes dict to Mongo DB.
+            Nothing, directly writes dict to Mongo DB collection_view.
 
         """
         logging.info(f"Write {item["url"]} to mongoDB...")
