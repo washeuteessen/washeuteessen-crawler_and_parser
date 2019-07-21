@@ -2,3 +2,7 @@
 *.json
 *.log
 *.pyc
+
+# Folder
+/parser/Scala/project
+/parser/Scala/target
