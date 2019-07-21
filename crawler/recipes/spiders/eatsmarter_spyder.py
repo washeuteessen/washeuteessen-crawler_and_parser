@@ -33,14 +33,7 @@ class EatsmarterSpyder(scrapy.Spider):
             response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with 
-                                - title, 
-                                - domain name, 
-                                - image url, 
-                                - list of ingredients, 
-                                - url and 
-                                - description text
-                                of recipe as value.
+            call to follow next page
         """
         # get all recipes 
         recipes = response.css(".tile")
@@ -50,22 +43,20 @@ class EatsmarterSpyder(scrapy.Spider):
             # extract information from html
             url = recipe.css("a::attr(href)").extract_first()
             try:
-                yield scrapy.Request("https://eatsmarter.de" + url, callback=self.parse_attr)
+                yield scrapy.Request("https://eatsmarter.de" + url, callback=self.parse_item)
             except TypeError as e:
                 logging.info(e) 
 
         # define url for next page
         next_page = f"https://eatsmarter.de/suche/rezepte?page={EatsmarterSpyder.page_number}&ft=&op=Suchen&form_build_id=form-YbfzSni-wg3IicfsadcO_O9FSpmEEoQSfFhec4gsb94&form_id=eatsmarter_search_search_form"
         
-        # check if next page number is below threshold
-        if EatsmarterSpyder.page_number <= 1000:
-            # increase page number by 1
-            EatsmarterSpyder.page_number += 1
+        # increase page number by 1
+        EatsmarterSpyder.page_number += 1
 
-            # get response of next page
-            yield response.follow(next_page, callback = self.parse)
+        # get response of next page
+        yield response.follow(next_page, callback = self.parse)
 
-    def parse_attr(self, response):
+    def parse_item(self, response):
         """
         Parse html response of scraper.
 

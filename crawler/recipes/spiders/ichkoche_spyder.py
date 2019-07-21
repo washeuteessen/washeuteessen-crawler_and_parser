@@ -31,14 +31,7 @@ class IchkocheSpyder(scrapy.Spider):
             response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with 
-                                - title, 
-                                - domain name, 
-                                - image url, 
-                                - list of ingredients, 
-                                - url and 
-                                - description text
-                                of recipe as value.
+            call to follow next page
         """
         # get all recipes 
         recipes = response.xpath("//article/div/h3")
@@ -47,7 +40,7 @@ class IchkocheSpyder(scrapy.Spider):
         for recipe in recipes:
             # extract information from html
             url = "https://www.ichkoche.at" + recipe.css("a::attr(href)").extract_first()
-            yield scrapy.Request(url, callback=self.parse_attr)
+            yield scrapy.Request(url, callback=self.parse_item)
 
         # define url for next page
         next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(IchkocheSpyder.page_number) 
@@ -58,7 +51,7 @@ class IchkocheSpyder(scrapy.Spider):
         # get response of next page
         yield response.follow(next_page, callback = self.parse)
 
-    def parse_attr(self, response):
+    def parse_item(self, response):
         """
         Parse html response of scraper.
 

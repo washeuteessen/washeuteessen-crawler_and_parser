@@ -8,10 +8,11 @@ import pymongo
 # mongo
 
 class HTMLParser(object):
+
     def __init__(db_name, col_name):
         # connect to mongo
         self.conn = pymongo.MongoClient(
-            '192.168.99.100', #VM IP-address
+            'mongo',
             27017
         )
 
@@ -19,8 +20,39 @@ class HTMLParser(object):
         self.db = conn["washeuteessen"]
 
         # load collections
-        self.collection_view = db["_recipes_view"]
-        self.collection_parsed = db["recipes_parsed"]
+        self.collection_raw = db["recipes_raw"]
+        self.collection_view = db["unparsedURLS"]
+        self.collection_parsed = db["recipes"]
+
+        # set info if recipe was sucessfully parsed
+        self.parsed = None
+
+    def update_raw_recipes(parsed):
+        """
+        Method to store success of parsing in raw collection.
+        """
+        # write date and parsed status to mongo
+        self.collection_raw.update(
+            {"url": html["url"]},
+            # write status and date to mongodb
+            {"$set": {"parsed_status": parsed,
+                      "$currentDate": {"parser_date": True}
+                      }}                
+        )
+
+    def write_parsed_recipes(item):
+        """
+        Method to store extracted information into mongo DB.
+
+        Returns:
+        ------------
+            Nothing, directly writes dict to Mongo DB.
+
+        """
+        logging.info(f"Write {item["url"]} to mongoDB...")
+
+        # dump data to mongo DB
+        self.collection_view.insert(dict(item))
 
     def parse_html():
         """
@@ -31,8 +63,10 @@ class HTMLParser(object):
         ------------
             item (dict): Json file with title, domain, image url, list of ingredients, url and text.
         """
-        # open raw html
-        html = self.collection.find()
+        # randomly open 1x raw html
+        html = self.collection_view.aggregate([{
+            $sample: {size: 1}
+        }])
 
         # create empty dict
         item = {}
@@ -41,6 +75,7 @@ class HTMLParser(object):
         domain = html["domain"]
 
         logging.info(f"Parse {item["url"]} ...")
+
         # parse html
         if domain == "chefkoch":
             # get recipe title
@@ -176,34 +211,31 @@ class HTMLParser(object):
                 # get text
                 text = " ".join(html["html_raw"].css(".rdb-instructions li::text").extract())
 
+        elif domain == "ichkoche":
+        # TODO: 
+
+
         else:
             logging.info(f"No applicable parsing method found. 
                            Please check whether parsing scheme exists for desired {domain}.")
+            self.parsed = 0
 
-        # TODO: What if nothing is found? item Definition an die richtige stelle, 
-        # dass es vor else gemacht wird aber nicht bei jedem elif einzeln
-        
-        # store information as item
-        item["title"] = title 
-        item["domain"] = html["domain"]
-        item["img_src"] = img_src
-        item["ingredients"] = ingredients
-        item["url"] = html["url"]
-        item["text"] = text
+        # write found specs to item dict        
+        if self.parsed = 0:
+            logging.info(f"Skipping {html["url"]}")
+    
+        else:
+            self.parsed = 1
+            logging.info(f"Successfully parsed {html["url"]}")
+            # store information as item
+            item["title"] = title 
+            item["domain"] = html["domain"]
+            item["img_src"] = img_src
+            item["ingredients"] = ingredients
+            item["url"] = html["url"]
+            item["text"] = text
 
-        return item
+            # write parsed recipe to mongo collection recipes
+            write_parsed_recipes(item)
 
-    def write_to_mongo(item):
-        """
-        Method to store extracted information into mongo DB.
-
-        Returns:
-        ------------
-            Nothing, directly writes dict to Mongo DB.
-
-        """
-        logging.info(f"Write {item["url"]} to mongoDB...")
-        # dump data to mongo DB
-        self.collection.insert(dict(item))
-
-        logging.info(f"Succesfully inserted {item["url"]} into mongoDB")
+        update_raw_recipes(parsed)
