@@ -21,7 +21,7 @@ class HTMLParser(object):
         )
 
         # load database
-        self.db = self.conn["washeuteessen"]
+        self.db = self.conn["recipes"]
 
         # load collections
         self.collection_raw = self.db["recipes_raw"]

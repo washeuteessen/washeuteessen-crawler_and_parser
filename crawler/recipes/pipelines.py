@@ -28,14 +28,12 @@ class RecipesPipeline(object):
         # Convert item to dict
         item_dict = dict(item)
         
-        # Trying to update existing document with htmlbody and current time
+        # Trying to update existing document with raw html doc and current time
         documentupdated = self.collection.update({"url": item_dict["url"]},
-                                                 {"$set":{"title":item_dict["title"],
-                                                          "ingredients":item_dict["ingredients"],
-                                                          "text":item_dict["text"],
-                                                          "img_src":item_dict["img_src"]},
-                                                  "$currentDate": {"lastFound": True}
-                                                  }
+                                                 {"$set":{
+                                                    "html_raw":item_dict["html_raw"],
+                                                    "$currentDate": {"lastFound": True}
+                                                  }}
                                                 )
         
         # If update Failed insert new document
