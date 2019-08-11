@@ -1,7 +1,10 @@
 import re
+import sys
 import logging
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 import pymongo
+from bs4 import BeautifulSoup
+from scrapy.http import HtmlResponse
 
 ## run mongo in docker
 ## open docker shell
@@ -28,9 +31,6 @@ class HTMLParser(object):
         self.collection_raw = self.db["recipes_raw"]
         self.collection_parsed = self.db["recipes"]
 
-        # set info if recipe was sucessfully parsed
-        self.parsed = None
-
         logging.info("Initialized parser")
 
     def update_raw_recipes(self, parsed, url):
@@ -45,9 +45,9 @@ class HTMLParser(object):
         self.collection_raw.update(
             {"url": url},
             # write status and date to mongodb
-            {"$set": {"parsed_status": parsed,
-                      "$currentDate": {"parser_date": True}
-                      }}                
+            {"$set": {"parsed_status": parsed},
+             "$currentDate": {"parser_date": True}
+            }                
         )
 
     def write_parsed_recipes(self, item):
@@ -62,7 +62,7 @@ class HTMLParser(object):
         logging.info(f"Write {item['url']} to mongoDB...")
 
         # dump data to mongo DB
-        self.collection_view.insert(dict(item))
+        self.collection_parsed.insert(dict(item))
 
     def parse_html(self):
         """
@@ -73,12 +73,10 @@ class HTMLParser(object):
         ------------
             item (dict): Json file with title, domain, image url, list of ingredients, url and text.
         """
-        logging.info("Extracting sample from view")
+        logging.info("Extracting unparsed sample from raw htmls")
 
-        # randomly open 1x raw html
-        html = self.collection_view.aggregate([{
-            "$sample": {"size": 1}
-        }])
+        # randomly open 1x unaprsed raw html
+        html = self.collection_raw.find_one({"parsed_status": False})
 
         # create empty dict
         item = {}
@@ -86,18 +84,22 @@ class HTMLParser(object):
         # get domain of raw html
         domain = html["domain"]
 
-        logging.info(f"Parse {item['url']} ...")
-
+        # convert raw html to html response object
+        response = HtmlResponse(url=html["url"], body=html["html_raw"], encoding='utf-8')
+        
+        logging.info(f"Parse {html['url']} ...")
+        
         # parse html
         if domain == "chefkoch":
+            
             # get recipe title
-            title = html["html_raw"].css(".page-title::text").extract_first()
+            title = response.css("h1::text").extract_first()
 
             # get title picture
-            img_src = html["html_raw"].css("a#0::attr(href)").extract_first()
+            img_src = response.css("a#0::attr(href)").extract_first()
             
             # get ingredients
-            ingredients = html["html_raw"].xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
+            ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
             ingredients_list = []
             for ingredient in ingredients:
                 # get name of ingredient
@@ -112,40 +114,46 @@ class HTMLParser(object):
             ingredients = ingredients_list
 
             # get text
-            text = re.sub(" +", " ", " ".join(html["html_raw"].css("#rezept-zubereitung::text").extract()) \
+            text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
                             .replace("\n", " ").replace("\r", " ")) \
                             .strip()
+            
+            # set parsed to True
+            parsed = True
 
         elif domain == "eatsmarter":
             # get recipe title
-            title = html["html_raw"].css("h1::text").extract_first()
+            title = response.css("h1::text").extract_first()
 
             # get title picture
-            img_src = html["html_raw"].css("img.photo::attr(src)").extract_first()
+            img_src = response.css("img.photo::attr(src)").extract_first()
 
             # get ingredients
-            ingredients = html["html_raw"].css('a.name::text').extract()
+            ingredients = response.css('a.name::text').extract()
 
             # get text
-            text = " ".join(html["html_raw"].css("div.preparation-step-items p::text").extract())
+            text = " ".join(response.css("div.preparation-step-items p::text").extract())
+                
+            # set parsed to True
+            parsed = True
 
         elif domain == "lecker":
             # check if url contains a recipe
-            if re.search(pattern="-[0-9]{5}.html$", string=html["url"]) is not None and re.search(pattern="datenschutzerklaerung", string=html["html_raw"].url) is None:
+            if re.search(pattern="-[0-9]{5}.html$", string=html["url"]) is not None and re.search(pattern="datenschutzerklaerung", string=response.url) is None:
 
                 # get recipe title
-                title = html["html_raw"].css("h1::text").extract_first()
+                title = response.css("h1::text").extract_first()
         
                 # get title picture
-                img_src = html["html_raw"].css(".article-figure--default-image img::attr(src)").extract_first()
+                img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
 
                 # version A of recipe presentation
                 if img_src is not None:
                     # get ingredients
-                    ingredients = html["html_raw"].css(".ingredientBlock::text").extract()
+                    ingredients = response.css(".ingredientBlock::text").extract()
 
                     # get text
-                    text = " ".join(html["html_raw"].css("dd::text").extract())
+                    text = " ".join(response.css("dd::text").extract())
                     
                     # strip \n
                     text = re.sub("\n", "", text)
@@ -157,27 +165,31 @@ class HTMLParser(object):
                 # version B of recipe presentation 
                 else:
                     # get url of main image
-                    img_src = html["html_raw"].css(".typo--editor+ .article-figure--fullsize img::attrc(src)")
+                    img_src = response.css(".typo--editor+ .article-figure--fullsize img::attrc(src)")
 
                     # get ingredients
-                    ingredients = html["html_raw"].css("h2+ ul li::text").extract()
+                    ingredients = response.css("h2+ ul li::text").extract()
 
                     # get text
                     text = "no_distinct_text_available"
 
+                        
+            # set parsed to True
+            parsed = True
+
         elif domain == "essenundtrinken":
             # check if url contains a recipe
-            if re.search(pattern="/rezepte/[0-9]{5}-", string=html["url"]) is not None and re.search(pattern=".jpg", string=html["html_raw"].url) is None:
+            if re.search(pattern="/rezepte/[0-9]{5}-", string=html["url"]) is not None and re.search(pattern=".jpg", string=response.url) is None:
 
                 # get recipe title
-                title = html["html_raw"].css(".headline-title::text").extract_first()
+                title = response.css(".headline-title::text").extract_first()
                 title = title.strip()
 
                 # get title picture
-                img_src = html["html_raw"].css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+                img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
 
                 # get ingredients
-                ingredients = html["html_raw"].css("ul.ingredients-list li::text").extract()
+                ingredients = response.css("ul.ingredients-list li::text").extract()
 
                 # strip \n
                 ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
@@ -190,25 +202,28 @@ class HTMLParser(object):
                 ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
 
                 # get text
-                text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+                text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
 
                 # sometimes text is not within paragraph
                 if len(text)<1:
-                    text = " ".join(html["html_raw"].css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+                    text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+                        
+            # set parsed to True
+            parsed = True
 
         elif domain == "womenshealth":
             # check if url contains a recipe
             if re.search(pattern="-rezept.[0-9]{7}.html", string=html["url"]) is not None:
 
                 # get recipe title
-                title = html["html_raw"].css(".v-A_-headline--ad::text").extract()[-1]
+                title = response.css(".v-A_-headline--ad::text").extract()[-1]
                 title = title.strip()
 
                 # get title picture
-                img_src = html["html_raw"].css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
+                img_src = response.css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
 
                 # get ingredients
-                ingredients = html["html_raw"].css("ul li::text").extract()
+                ingredients = response.css("ul li::text").extract()
 
                 # strip \n
                 ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
@@ -221,40 +236,46 @@ class HTMLParser(object):
                 ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
 
                 # get text
-                text = " ".join(html["html_raw"].css(".rdb-instructions li::text").extract())
+                text = " ".join(response.css(".rdb-instructions li::text").extract())
+                        
+            # set parsed to True
+            parsed = True
 
         elif domain == "ichkoche":
             # get recipe title
-            title = html["html_raw"].xpath("//title/text()").extract_first()[:-28]
+            title = response.xpath("//title/text()").extract_first()[:-28]
 
             # get title picture
-            img_src = html["html_raw"].xpath("//img[@itemprop='image']/@src").extract_first()
+            img_src = response.xpath("//img[@itemprop='image']/@src").extract_first()
             #//*[@id="page_wrap_inner"]/div[3]/div/div[2]/article[1]
 
             ## get ingredients
             # extract ingredients which contain links
-            ingredients_a = html["html_raw"].xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
+            ingredients_a = response.xpath("//div[@class='ingredients_wrap']/ul/li/span/a/text()").extract()
 
             # extract links which don't contain links
-            ingredients_b = html["html_raw"].xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
+            ingredients_b = response.xpath("//div[@class='ingredients_wrap']/ul/li/span[@class='name']/text()").extract()
 
             # combine both lists
             ingredients_list = ingredients_a + ingredients_b
 
             # get text
-            texts_list = html["html_raw"].xpath("//div[@class='description']/ol/li").extract()
+            texts_list = response.xpath("//div[@class='description']/ol/li").extract()
             text = " ".join([re.sub("<br>|<li>|<strong>|</strong>|</li>", " ", text).strip() for text in texts_list])
+
+            # set parsed to True
+            parsed = True
 
         else:
             logging.info(f"No applicable parsing method found. Please check whether parsing scheme exists for desired {domain}.")
-            self.parsed = 0
+            parsed = False
 
         # write found specs to item dict        
-        if self.parsed == 0:
+        if parsed == False:
             logging.info(f"Skipping {html['url']}")
     
         else:
-            self.parsed = 1
+            parsed = True
             logging.info(f"Successfully parsed {html['url']}")
             # store information as item
             item["title"] = title 
@@ -267,7 +288,7 @@ class HTMLParser(object):
             # write parsed recipe to mongo collection recipes
             self.write_parsed_recipes(item)
 
-        self.update_raw_recipes(self.parsed, html["url"])
+        self.update_raw_recipes(parsed, html["url"])
 
 if __name__ == "__main__":
     parser = HTMLParser()
