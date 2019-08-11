@@ -28,12 +28,14 @@ Use scrapy to crawl title, url, image-url, ingredients and text of german recipe
 
 ## Local run
 
-1. build image from local docker file
+1. Adapt host of mongo client 
+
+2. build image from local docker file
     ```bash
     docker build .
     ```
     
-2. run image 
+3. run image 
     ```bash
     docker run --env SPIDER_NAME=chefkoch image
     ```

@@ -16,3 +16,4 @@ class RecipesItem(scrapy.Item):
     url = scrapy.Field()
     html_raw = scrapy.Field()
     domain = scrapy.Field()
+    parsed_status = scrapy.Field()

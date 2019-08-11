@@ -1,5 +1,6 @@
 import re
 import logging
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 import pymongo
 
 ## run mongo in docker
@@ -25,11 +26,12 @@ class HTMLParser(object):
 
         # load collections
         self.collection_raw = self.db["recipes_raw"]
-        self.collection_view = self.db["unparsedURLS"]
         self.collection_parsed = self.db["recipes"]
 
         # set info if recipe was sucessfully parsed
         self.parsed = None
+
+        logging.info("Initialized parser")
 
     def update_raw_recipes(self, parsed, url):
         """
@@ -71,6 +73,8 @@ class HTMLParser(object):
         ------------
             item (dict): Json file with title, domain, image url, list of ingredients, url and text.
         """
+        logging.info("Extracting sample from view")
+
         # randomly open 1x raw html
         html = self.collection_view.aggregate([{
             "$sample": {"size": 1}

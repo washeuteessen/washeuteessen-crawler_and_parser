@@ -45,5 +45,6 @@ class EssenundtrinkenSpyder(CrawlSpider):
         items["url"] = response.url
         items["html_raw"] = response.text
         items["domain"] = self.name
+        items["parsed_status"] = False
 
         return items
