@@ -5,7 +5,7 @@ import subprocess
 import urllib
 
 class IchkocheSpyder(scrapy.Spider):
-    """ 
+    """
     This class scrapes www.ichkoche.at for recipes.
 
     CrawlingApproach:
@@ -33,18 +33,18 @@ class IchkocheSpyder(scrapy.Spider):
         Returns:
             call to follow next page
         """
-        # get all recipes 
+        # get all recipes
         recipes = response.xpath("//article/div/h3")
 
-        # iterate over recipes 
+        # iterate over recipes
         for recipe in recipes:
             # extract information from html
             url = "https://www.ichkoche.at" + recipe.css("a::attr(href)").extract_first()
             yield scrapy.Request(url, callback=self.parse_item)
 
         # define url for next page
-        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(IchkocheSpyder.page_number) 
-        
+        next_page = "https://www.ichkoche.at/rezepte-az?page="+ str(IchkocheSpyder.page_number)
+
         # increase page number by 1
         IchkocheSpyder.page_number += 1
 
@@ -59,9 +59,9 @@ class IchkocheSpyder(scrapy.Spider):
             response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with 
+            items.json (dict): Json file with
                                 - scraped url,
-                                - domain name, 
+                                - domain name,
                                 - html_body
                                 of recipe as value.
         """
@@ -70,7 +70,7 @@ class IchkocheSpyder(scrapy.Spider):
 
         # store information as item
         items["url"] = response.url
-        items["html_raw"] = response.body
+        items["html_raw"] = response.text
         items["domain"] = self.name
 
         return items

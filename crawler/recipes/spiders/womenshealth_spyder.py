@@ -7,7 +7,7 @@ import subprocess
 import urllib
 
 class WomenshealthSpyder(CrawlSpider):
-    """ 
+    """
     This class scrapes www.womenshealth.de for recipes.
 
     CrawlingApproach:
@@ -21,7 +21,7 @@ class WomenshealthSpyder(CrawlSpider):
     # define start urls
     start_urls = ["https://www.womenshealth.de/food/gesunde-rezepte/"]
 
-    # define rule to only parse internal links 
+    # define rule to only parse internal links
     rules = (Rule(LxmlLinkExtractor(allow_domains="womenshealth.de"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
@@ -33,9 +33,9 @@ class WomenshealthSpyder(CrawlSpider):
 
         Returns:
         ------------
-            items.json (dict): Json file with 
+            items.json (dict): Json file with
                                 - scraped url,
-                                - domain name, 
+                                - domain name,
                                 - html_body
                                 of recipe as value.
         """
@@ -45,7 +45,7 @@ class WomenshealthSpyder(CrawlSpider):
 
         # store information as item
         items["url"] = response.url
-        items["html_raw"] = response.body
+        items["html_raw"] = response.text
         items["domain"] = self.name
 
         return items

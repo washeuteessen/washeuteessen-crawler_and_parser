@@ -7,7 +7,7 @@ import subprocess
 import urllib
 
 class EatsmarterSpyder(scrapy.Spider):
-    """ 
+    """
     This class scrapes www.eatsmarter.de for recipes.
 
     CrawlingApproach:
@@ -35,21 +35,21 @@ class EatsmarterSpyder(scrapy.Spider):
         Returns:
             call to follow next page
         """
-        # get all recipes 
+        # get all recipes
         recipes = response.css(".tile")
 
-        # iterate over recipes 
+        # iterate over recipes
         for recipe in recipes:
             # extract information from html
             url = recipe.css("a::attr(href)").extract_first()
             try:
                 yield scrapy.Request("https://eatsmarter.de" + url, callback=self.parse_item)
             except TypeError as e:
-                logging.info(e) 
+                logging.info(e)
 
         # define url for next page
         next_page = f"https://eatsmarter.de/suche/rezepte?page={EatsmarterSpyder.page_number}&ft=&op=Suchen&form_build_id=form-YbfzSni-wg3IicfsadcO_O9FSpmEEoQSfFhec4gsb94&form_id=eatsmarter_search_search_form"
-        
+
         # increase page number by 1
         EatsmarterSpyder.page_number += 1
 
@@ -65,8 +65,8 @@ class EatsmarterSpyder(scrapy.Spider):
 
         Returns:
             items.json (dict): Json file with
-                                - scraped url, 
-                                - domain name, 
+                                - scraped url,
+                                - domain name,
                                 - html_body
                                 of recipe as value.
         """
@@ -75,7 +75,7 @@ class EatsmarterSpyder(scrapy.Spider):
 
         # store information as item
         items["url"] = response.url
-        items["html_raw"] = response.body
+        items["html_raw"] = response.text
         items["domain"] = self.name
 
         return items

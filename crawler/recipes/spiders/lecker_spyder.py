@@ -7,7 +7,7 @@ import subprocess
 import urllib
 
 class LeckerSpyder(CrawlSpider):
-    """ 
+    """
     This class scrapes www.lecker.de for recipes.
 
     CrawlingApproach:
@@ -21,7 +21,7 @@ class LeckerSpyder(CrawlSpider):
     # define start urls
     start_urls = ["https://www.lecker.de"]
 
-    # define rule to only parse internal links 
+    # define rule to only parse internal links
     rules = (Rule(LxmlLinkExtractor(allow_domains="lecker.de"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
@@ -32,9 +32,9 @@ class LeckerSpyder(CrawlSpider):
             response (str): response object of HTML request.
 
         Returns:
-            items.json (dict): Json file with 
+            items.json (dict): Json file with
                                 - scraped url,
-                                - domain name, 
+                                - domain name,
                                 - html_body
                                 of recipe as value.
         """
@@ -43,7 +43,7 @@ class LeckerSpyder(CrawlSpider):
 
         # store information as item
         items["url"] = response.url
-        items["html_raw"] = response.body
+        items["html_raw"] = response.text
         items["domain"] = self.name
-        
+
         return items
