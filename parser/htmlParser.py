@@ -20,7 +20,7 @@ class HTMLParser(object):
     def __init__(self):
         # connect to mongo
         self.conn = pymongo.MongoClient(
-            'mongo',
+            "192.168.99.100", #'mongo',
             27017
         )
 
@@ -96,25 +96,19 @@ class HTMLParser(object):
             title = response.css("h1::text").extract_first()
 
             # get title picture
-            img_src = response.css("a#0::attr(href)").extract_first()
+            img_src = response.css("meta[property='og:image']::attr(content)").extract_first()
             
             # get ingredients
-            ingredients = response.xpath('//*[@id="recipe-incredients"]/div[1]/div[2]/table//tr')
-            ingredients_list = []
-            for ingredient in ingredients:
-                # get name of ingredient
-                if len(ingredient.xpath('td[2]//text()').extract_first().strip()) > 1:
-                    ingredient = ingredient.xpath('td[2]//text()').extract_first().strip()
-                else:
-                    ingredient = ingredient.xpath('td[2]/a/text()').extract_first().strip()
+            ingredients = response.css("td[class='td-right'] span::text").extract()
 
-                # append ingredient dict to ingredients list
-                ingredients_list.append(ingredient)
+            # append ingredients saved as link text 
+            ingredients.extend(response.css("td[class='td-right'] span a::text").extract())
 
-            ingredients = ingredients_list
+            # strip whitespace from ingredients
+            ingredients = [ingredient.strip() for ingredient in ingredients]
 
-            # get text
-            text = re.sub(" +", " ", " ".join(response.css("#rezept-zubereitung::text").extract()) \
+            # get text)
+            text = re.sub(" +", " ", " ".join(response.xpath("/html/body/main/article[3]/div[1]/text()").extract()) \
                             .replace("\n", " ").replace("\r", " ")) \
                             .strip()
             
@@ -258,6 +252,7 @@ class HTMLParser(object):
 
             # combine both lists
             ingredients_list = ingredients_a + ingredients_b
+            ingredients = ingredients_list
 
             # get text
             texts_list = response.xpath("//div[@class='description']/ol/li").extract()
