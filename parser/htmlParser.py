@@ -20,7 +20,7 @@ class HTMLParser(object):
     def __init__(self):
         # connect to mongo
         self.conn = pymongo.MongoClient(
-            "192.168.99.100", #'mongo',
+            "mongo", #"192.168.99.100"
             27017
         )
 
@@ -139,79 +139,76 @@ class HTMLParser(object):
                 # set parsed to True
                 parsed = True
 
-            # elif domain == "lecker": ##
+            elif domain == "lecker": ##
 
-        #         # get recipe title
-        #         title = response.css("h1::text").extract_first()
+                # get recipe title
+                title = response.css("h1::text").extract_first()
         
-        #         # get title picture
-        #         img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
+                # get title picture
+                img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
 
-        #         # version A of recipe presentation
-        #         if img_src is not None:
-        #             # get ingredients
-        #             ingredients = response.css(".ingredientBlock::text").extract()
-
-        #             # get text
-        #             text = " ".join(response.css("dd::text").extract())
-                    
-        #             # strip \n
-        #             text = re.sub("\n", "", text)
-
-        #             # strip whitespace
-        #             text = re.sub(" +", " ", text)
-        #             text = text.strip()
-
-        #         # version B of recipe presentation 
-        #         else:
-        #             # get url of main image
-        #             img_src = response.css(".typo--editor+ .article-figure--fullsize img::attr(src)")
-
-        #             # get ingredients
-        #             ingredients = response.css("h2+ ul li::text").extract()
-
-        #             # get text
-        #             text = "no_distinct_text_available"
-
-                        
-        #         # set parsed to True
-        #         parsed = True
-
-            elif domain == "essenundtrinken": ##
-                # check if url contains a recipe
-                if re.search(pattern="/rezepte/[0-9]{5}-", string=html["url"]) is not None and re.search(pattern=".jpg", string=response.url) is None:
-
-                    # get recipe title
-                    title = response.css(".headline-title::text").extract_first()
-                    title = title.strip()
-
-                    # get title picture
-                    img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
-
+                # version A of recipe presentation
+                if img_src is not None:
                     # get ingredients
-                    ingredients = response.css("ul.ingredients-list li::text").extract()
-
-                    # strip \n
-                    ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
-
-                    # strip whitespace
-                    ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
-                    ingredients = [ingredient.strip() for ingredient in ingredients]
-
-                    # strip empty list elemens
-                    ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+                    ingredients = response.css(".ingredientBlock::text").extract()
 
                     # get text
-                    text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+                    text = " ".join(response.css("dd::text").extract())
+                    
+                    # strip \n
+                    text = re.sub("\n", "", text)
 
-                    # sometimes text is not within paragraph
-                    if len(text)<1:
-                        text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
-                            
-                    # set parsed to True
-                    parsed = True
+                    # strip whitespace
+                    text = re.sub(" +", " ", text)
+                    text = text.strip()
 
-            elif domain == "womenshealth": ##
+                # version B of recipe presentation 
+                else:
+                    # get url of main image
+                    img_src = response.css(".typo--editor+ .article-figure--fullsize img::attr(src)")
+
+                    # get ingredients
+                    ingredients = response.css("h2+ ul li::text").extract()
+
+                    # get text
+                    text = "no_distinct_text_available"
+
+                        
+                # set parsed to True
+                parsed = True
+
+            elif domain == "essenundtrinken": 
+                # get recipe title
+                title = response.css(".headline-title::text").extract_first()
+                title = title.strip()
+
+                # get title picture
+                img_src = response.css(".recipe-img > img:nth-child(1)::attr(src)").extract_first()
+
+                # get ingredients
+                ingredients = response.css("ul.ingredients-list li::text").extract()
+
+                # strip \n
+                ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+
+                # strip whitespace
+                ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
+                ingredients = [ingredient.strip() for ingredient in ingredients]
+
+                # strip empty list elemens
+                ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+
+                # get text
+                text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text p::text").extract())
+
+                # sometimes text is not within paragraph
+                if len(text)<1:
+                    text = " ".join(response.css("ul.preparation li.preparation-step div.preparation-text::text").extract())
+                        
+                # set parsed to True
+                parsed = True
+
+            elif domain == "womenshealth": 
 
                 # get recipe title
                 title = response.css(".v-A_-headline--ad::text").extract()[-1]
@@ -239,7 +236,7 @@ class HTMLParser(object):
                 # set parsed to True
                 parsed = True
 
-            elif domain == "ichkoche": ##
+            elif domain == "ichkoche": 
                 # get recipe title
                 title = response.xpath("//title/text()").extract_first()[:-28]
 
