@@ -22,7 +22,7 @@ class LeckerSpyder(CrawlSpider):
     start_urls = ["https://www.lecker.de"]
 
     # define rule to only parse internal links
-    rules = (Rule(LxmlLinkExtractor(allow_domains="lecker.de"), callback="parse_item", follow=True),)
+    rules = (Rule(LxmlLinkExtractor(allow_domains="lecker.de", allow="\d{5}.html$"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
         """
