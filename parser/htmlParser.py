@@ -140,44 +140,42 @@ class HTMLParser(object):
                 parsed = True
 
             # elif domain == "lecker": ##
-            #     # check if url contains a recipe
-            #     if re.search(pattern="-[0-9]{5}.html$", string=html["url"]) is not None and re.search(pattern="datenschutzerklaerung", string=response.url) is None:
 
-            #         # get recipe title
-            #         title = response.css("h1::text").extract_first()
-            
-            #         # get title picture
-            #         img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
+        #         # get recipe title
+        #         title = response.css("h1::text").extract_first()
+        
+        #         # get title picture
+        #         img_src = response.css(".article-figure--default-image img::attr(src)").extract_first()
 
-            #         # version A of recipe presentation
-            #         if img_src is not None:
-            #             # get ingredients
-            #             ingredients = response.css(".ingredientBlock::text").extract()
+        #         # version A of recipe presentation
+        #         if img_src is not None:
+        #             # get ingredients
+        #             ingredients = response.css(".ingredientBlock::text").extract()
 
-            #             # get text
-            #             text = " ".join(response.css("dd::text").extract())
+        #             # get text
+        #             text = " ".join(response.css("dd::text").extract())
+                    
+        #             # strip \n
+        #             text = re.sub("\n", "", text)
+
+        #             # strip whitespace
+        #             text = re.sub(" +", " ", text)
+        #             text = text.strip()
+
+        #         # version B of recipe presentation 
+        #         else:
+        #             # get url of main image
+        #             img_src = response.css(".typo--editor+ .article-figure--fullsize img::attr(src)")
+
+        #             # get ingredients
+        #             ingredients = response.css("h2+ ul li::text").extract()
+
+        #             # get text
+        #             text = "no_distinct_text_available"
+
                         
-            #             # strip \n
-            #             text = re.sub("\n", "", text)
-
-            #             # strip whitespace
-            #             text = re.sub(" +", " ", text)
-            #             text = text.strip()
-
-            #         # version B of recipe presentation 
-            #         else:
-            #             # get url of main image
-            #             img_src = response.css(".typo--editor+ .article-figure--fullsize img::attr(src)")
-
-            #             # get ingredients
-            #             ingredients = response.css("h2+ ul li::text").extract()
-
-            #             # get text
-            #             text = "no_distinct_text_available"
-
-                            
-            #         # set parsed to True
-            #         parsed = True
+        #         # set parsed to True
+        #         parsed = True
 
             elif domain == "essenundtrinken": ##
                 # check if url contains a recipe
@@ -214,34 +212,32 @@ class HTMLParser(object):
                     parsed = True
 
             elif domain == "womenshealth": ##
-                # check if url contains a recipe
-                if re.search(pattern="-rezept.[0-9]{7}.html", string=html["url"]) is not None:
 
-                    # get recipe title
-                    title = response.css(".v-A_-headline--ad::text").extract()[-1]
-                    title = title.strip()
+                # get recipe title
+                title = response.css(".v-A_-headline--ad::text").extract()[-1]
+                title = title.strip()
 
-                    # get title picture
-                    img_src = response.css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
+                # get title picture
+                img_src = response.css(".v-A_-article__hero__image > img:nth-child(1)::attr(src)").extract_first()
 
-                    # get ingredients
-                    ingredients = response.css("ul li::text").extract()
+                # get ingredients
+                ingredients = response.css("ul li::text").extract()
 
-                    # strip \n
-                    ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
+                # strip \n
+                ingredients = [re.sub("\n", "", ingredient) for ingredient in ingredients]
 
-                    # strip whitespace
-                    ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
-                    ingredients = [ingredient.strip() for ingredient in ingredients]
+                # strip whitespace
+                ingredients = [re.sub(' +', " ", ingredient) for ingredient in ingredients]
+                ingredients = [ingredient.strip() for ingredient in ingredients]
 
-                    # strip empty list elemens
-                    ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
+                # strip empty list elemens
+                ingredients = [ingredient for ingredient in ingredients if len(ingredient)>0]
 
-                    # get text
-                    text = " ".join(response.css(".rdb-instructions li::text").extract())
-                            
-                    # set parsed to True
-                    parsed = True
+                # get text
+                text = " ".join(response.css(".rdb-instructions li::text").extract())
+                        
+                # set parsed to True
+                parsed = True
 
             elif domain == "ichkoche": ##
                 # get recipe title

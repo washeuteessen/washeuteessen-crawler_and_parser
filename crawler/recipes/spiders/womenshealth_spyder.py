@@ -22,7 +22,7 @@ class WomenshealthSpyder(CrawlSpider):
     start_urls = ["https://www.womenshealth.de/food/gesunde-rezepte/"]
 
     # define rule to only parse internal links
-    rules = (Rule(LxmlLinkExtractor(allow_domains="womenshealth.de"), callback="parse_item", follow=True),)
+    rules = (Rule(LxmlLinkExtractor(allow_domains="womenshealth.de", allow="-rezept\.\d{7}\.html$"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
         """
