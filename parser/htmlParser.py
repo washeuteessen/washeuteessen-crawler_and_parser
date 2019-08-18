@@ -123,7 +123,7 @@ class HTMLParser(object):
                 # set parsed to True
                 parsed = True
 
-            elif domain == "eatsmarter":
+            elif domain == "eatsmarter": ##
                 # get recipe title
                 title = response.css("h1::text").extract_first()
 
@@ -139,7 +139,7 @@ class HTMLParser(object):
                 # set parsed to True
                 parsed = True
 
-            # elif domain == "lecker":
+            # elif domain == "lecker": ##
             #     # check if url contains a recipe
             #     if re.search(pattern="-[0-9]{5}.html$", string=html["url"]) is not None and re.search(pattern="datenschutzerklaerung", string=response.url) is None:
 
@@ -179,7 +179,7 @@ class HTMLParser(object):
             #         # set parsed to True
             #         parsed = True
 
-            elif domain == "essenundtrinken":
+            elif domain == "essenundtrinken": ##
                 # check if url contains a recipe
                 if re.search(pattern="/rezepte/[0-9]{5}-", string=html["url"]) is not None and re.search(pattern=".jpg", string=response.url) is None:
 
@@ -213,7 +213,7 @@ class HTMLParser(object):
                     # set parsed to True
                     parsed = True
 
-            elif domain == "womenshealth":
+            elif domain == "womenshealth": ##
                 # check if url contains a recipe
                 if re.search(pattern="-rezept.[0-9]{7}.html", string=html["url"]) is not None:
 
@@ -240,10 +240,10 @@ class HTMLParser(object):
                     # get text
                     text = " ".join(response.css(".rdb-instructions li::text").extract())
                             
-                # set parsed to True
-                parsed = True
+                    # set parsed to True
+                    parsed = True
 
-            elif domain == "ichkoche":
+            elif domain == "ichkoche": ##
                 # get recipe title
                 title = response.xpath("//title/text()").extract_first()[:-28]
 
