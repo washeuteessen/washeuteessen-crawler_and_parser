@@ -1,6 +1,7 @@
 import re
 from ..items import RecipesItem
 import scrapy
+from scrapy.exceptions import CloseSpider
 import subprocess
 import urllib
 
@@ -13,6 +14,7 @@ class ChefkochSpyder(scrapy.Spider):
     - extract url of each recipe step by step
     - go to each recipe url and extract content
     - go to next page by incrementing page number by 30
+    - stop scraper, if page number 11.006 alias 330.180 is reached
     """
     # define name of spyder
     name = "chefkoch"
@@ -47,6 +49,12 @@ class ChefkochSpyder(scrapy.Spider):
 
         # increase page number by 30
         ChefkochSpyder.page_number += 30
+
+        # check whether specific page (probably last page with content) has been reached and close spider
+        max_page_number = 330180
+        
+        if ChefkochSpyder.page_number == max_page_number:
+            raise CloseSpider(reason = f"Max. pagenumber of {max_page_number} reached. No more recipes to crawl.")
 
         # get response of next page
         yield response.follow(next_page, callback = self.parse)
